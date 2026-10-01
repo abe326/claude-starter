@@ -1,0 +1,57 @@
+# design_docs_reminder.py の判定ケース。影響マップは reminder-fixture/docs/設計書/README.md（固定の模擬）を使う。
+# 書式: <期待 none|remind><TAB><file_path><TAB><stdout に含まれるべき文字列><TAB><session_id><TAB><CLAUDE_PROJECT_DIR の上書き><TAB><フェーズ>
+# 3 列目が `!` で始まるときは「含まれてはいけない文字列」。
+# 6 列目のフェーズは環境変数 CLAUDE_SKELETON_PHASE で渡す。省略・`-` は Build（v1.1.0 からのケースは Build の挙動）。
+# 3〜6 列目は省略可。途中の列を飛ばすときは `-` を置く（空欄のタブ連続は bash の read が 1 つに畳むので列がずれる）。
+# session_id を省略した行は毎回リマインドが出る。
+# 5 列目を省略した行は reminder-fixture/ を CLAUDE_PROJECT_DIR にする。{WIN} は run-all.sh がその Windows 形式（C:\…）に置き換える。
+# 行頭 # と空行は無視。
+
+# --- 影響マップに当たる ---
+remind	src/auth/login.py	docs/設計書/05-セキュリティ設計.md
+remind	backend/rbac/roles.py	05-セキュリティ設計.md
+remind	supabase/migrations/20260923_init.sql	02-architecture.md
+remind	.github/workflows/deploy.yml	07-開発運用設計.md
+remind	Dockerfile	07-開発運用設計.md
+remind	docker-compose.dev.yml	07-開発運用設計.md
+remind	tests/test_login.py	06-品質設計.md
+remind	docs/設計書/decisions/ADR-001-naming.md	decisions/README.md
+remind	docs/設計書/01-overview.md	プロジェクト概要.html
+remind	package.json	02-architecture.md
+
+# --- 当たらない ---
+none	src/util/strings.py
+none	README.md
+none	docs/プロジェクト概要.html
+none	.work/一時/20260923_確認/x.md
+none	.claude/skills/task/SKILL.md
+none	docs/案件/01_タスク管理/open/QA-01_x.md
+none	/tmp/other/auth.py
+
+# --- 同じ session_id では同じ候補の組み合わせを 2 回出さない ---
+remind	src/auth/a.py	05-セキュリティ設計.md	sess-dup-1
+none	src/auth/b.py	-	sess-dup-1
+remind	tests/test_a.py	06-品質設計.md	sess-dup-1
+
+# --- Windows 形式（file_path・ルートとも C:\…）---
+remind	{WIN}\src\auth\login.py	05-セキュリティ設計.md	-	{WIN}
+
+# --- 打合せ記録は影響マップを引かず [落ち先]（フェーズに関係なく、ファイルごとにセッション 1 回）---
+remind	docs/案件/02_打合せ/20260923_キックオフ.md	[落ち先]	sess-mtg-1
+none	docs/案件/02_打合せ/20260923_キックオフ.md	-	sess-mtg-1
+remind	docs/案件/02_打合せ/20260930_定例.md	[落ち先]	sess-mtg-1
+remind	docs/案件/02_打合せ/20260923_キックオフ.md	!設計書追随	sess-mtg-2
+remind	docs/案件/02_打合せ/20260923_キックオフ.md	[落ち先]	sess-mtg-3	-	Sketch
+# 打合せフォルダの README は記録ではないので、影響マップの通常の追随（[落ち先] ではない）
+remind	docs/案件/02_打合せ/README.md	!落ち先	sess-mtg-4
+
+# --- フェーズ別（design_docs_reminder のレベル: Sketch=情報 / Build=警告）---
+remind	src/auth/login.py	[設計書候補]	sess-ph-1	-	Sketch
+none	tests/test_login.py	-	sess-ph-1	-	Sketch
+remind	src/auth/login.py	直さなくてよい	-	-	Sketch
+# 旧い値「開発」「運用」はどちらも Build に読み替わるので、同一セッションで混ぜても二重に出ない
+remind	src/auth/login.py	決まったことを 1 行	sess-ph-2	-	開発
+none	src/auth/login.py	-	sess-ph-2	-	運用
+remind	src/auth/login.py	[設計書候補]	sess-ph-3	-	Sketch
+remind	src/auth/login.py	[設計書追随]	sess-ph-3	-	Build
+none	src/auth/login.py	-	sess-ph-3	-	Build

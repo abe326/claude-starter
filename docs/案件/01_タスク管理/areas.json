@@ -1,0 +1,11 @@
+{
+  "areas": {
+    "横断": "QA",
+    "文書": "DOC",
+    "環境": "ENV",
+    "運用": "OPS",
+    "仕様": "SPEC",
+    "配布物(home/)": "HOME",
+    "install・検査・hook": "TOOL"
+  }
+}

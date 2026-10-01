@@ -1,0 +1,15 @@
+{
+  "_説明": "案件ごとの設定。テンプレのコードは書き換えずにここへ書く。work_area_allow: 置き場ガードが通すルート相対の glob（仕組みの固定パス）。nested_repos: 中に別の git リポがあるフォルダ（影響マップと鮮度メタで使う）。save_cues: Claude が glob に当たるファイルを書いたら、ファイルごとにセッション 1 回 cue を促す（案件で足してよい）。読むのは .claude/hooks/project_config.py",
+  "work_area_allow": [],
+  "nested_repos": [],
+  "save_cues": [
+    {
+      "glob": [".claude/rules/**", ".claude/skills/**", ".claude/hooks/**"],
+      "cue": "仕組みを直した。スケルトンから入ったものを直したなら、スケルトンにも返すかを docs/ハーネス台帳.md の「返す」列に 1 行（harness スキル）"
+    },
+    {
+      "glob": "環境情報.md",
+      "cue": "環境情報を直した。値は docs/ に転記しない。構成が変わったなら 02-構成 を sync-design-docs で直す"
+    }
+  ]
+}

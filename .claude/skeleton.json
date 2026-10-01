@@ -1,0 +1,517 @@
+{
+  "_説明": "project-skeleton の init.py が書く記録（版・生成時の値・入れたファイルの元の内容の sha）。手で直さない",
+  "version": "1.5.0",
+  "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2",
+  "generated": "2026-10-01",
+  "updated": "2026-10-01",
+  "values": {
+    "name": "claude-starter",
+    "slug": "claude-starter",
+    "desc": "Claude Code の初期セット。~/.claude に入れる汎用の決めごと・skill・rules・hooks と、プロジェクトから育てて自動展開する仕組み",
+    "owner": "",
+    "created": "2026-10-01",
+    "skeleton_version": "1.5.0"
+  },
+  "files": {
+    ".claude/hooks/design_docs_reminder.py": {
+      "sha": "e7190047437b8e0d1555e1572614b4bcdc8a405462a95cccc7fa010960cc1244",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/design_docs_reminder.sh": {
+      "sha": "333da02e9828c5dc2999bf75b2de528d2e3c29692d7655d29db1eaeb7c45a90e",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/drops.py": {
+      "sha": "c38e0b969f845e0362cbd8446cea6bc0bc3e98780f9907e88d2f5f912fe97dd0",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/impact_map.py": {
+      "sha": "6a8017f8b7b2b811f63d24ecd53cc12125a0fec2d2209df47737066663a88059",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/machine_context.py": {
+      "sha": "e104bf5c1c9fc0055723a99dc6336b89832b45fb329f7fe061d3b6881faa6f4e",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/phase.py": {
+      "sha": "a45d243a20eabfe8383a38d596728a79c478e618d61f92b29dc4a27139658d2b",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/pickup_check.py": {
+      "sha": "e90f23f0e44537cf9ad7ef0e21e1eb7fd8a8084c2de59431caf28fa80d5743aa",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/pickup_check.sh": {
+      "sha": "9c3e06ceb86825d3935baf30e2b31e0dc193f8c80fd5f6f13854b703cbf30264",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/pickup_cue.py": {
+      "sha": "dc1f92974de17c4af6e5d7696dd40ce50e1bc53c839435df61771d47e19ee9c2",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/pickup_cue.sh": {
+      "sha": "a3182afcad404d2bdf0728d7cccd9b676dc990351b62dca004022ad0769398ed",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/pickup_state.py": {
+      "sha": "810bde95f1d1171e56b9081914176a65f120750e90214d495bedb48399a37850",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/project_config.py": {
+      "sha": "209c689491caca0ea609ab4f47115bb683c17c09051e328691b975f3ed3fdd19",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/session_context.sh": {
+      "sha": "02d539ae43ad76d513e978ddd3dc2242ff0ede220f84d9e23d08f1d89cedfbbe",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/skeleton_drift.py": {
+      "sha": "2dd010fad1471d4ced40e803a3df712da7fdc13a2e5c4a591b9921e552e955f7",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/README.md": {
+      "sha": "83271a00438b393c6cfa4c2b7c7a4228652339a32acbb8d26f3b00bc9703c074",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/ハーネス台帳.md": {
+      "sha": "8e54fab57aec46e8e8608d28e165dad381b1439c84e1f2201900db77e831f433",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/プロジェクト概要.html": {
+      "sha": "282195b1de7f893bd7c10ecdbf24f3e6799766bb23cefff33cfcd463f7475460",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/案件/01_タスク管理/areas.json": {
+      "sha": "a3484c674a73c5fa35e319fff9e75969e6dcf6fde741451fe9c53aa4c2648891",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/案件/01_タスク管理/closed/.keep": {
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/案件/01_タスク管理/open/APP-01_ログイン.md": {
+      "sha": "36f94e76dc5a26369b67a55ec46d4c9d350565ea4dc738832293a699ac685a7d",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/案件/01_タスク管理/open/QA-01_派遣を含めるか.md": {
+      "sha": "c303cd1b500625de8c3bd070dce960dbf6be2f2fec5f89a1bf8eef10e67b685c",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/案件/02_打合せ/README.md": {
+      "sha": "0988a04c8ded027c2597f311a8f0e765ae9b3c3d1bbdf5e204f680b745e75510",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/案件/確認依頼一覧.md": {
+      "sha": "c39445826f67dd096b0eee76d1e09f745d6f4601db85c77fd56b28ff1c5e1e9b",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/設計書/01-overview.md": {
+      "sha": "39f2e2dacb2ee7246b7033304b07201323316171ddbfc553a13ea6915c75e5d4",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/設計書/05-セキュリティ設計.md": {
+      "sha": "d8312cb9c450db9ee9e611f7bcb5636375f1104ba34348b5f11c78c8a6dce616",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/設計書/README.md": {
+      "sha": "b3d45bc8880ceaab1795e28760d19c88b3a44765890c5fef82098d822dcd1bb2",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/drops-cases/project/docs/設計書/decisions/ADR-003-sample.md": {
+      "sha": "05bcf1489fe8f64bd3070f0f40afd1bd64066c8f648e1312502597a0818070b9",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/hook-cases-guard.txt": {
+      "sha": "1df18b0cbb7d3b88aec440b1697cf86ac0fb8da3146848e315b0cbfa0571009f",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/hook-cases-pickup.txt": {
+      "sha": "52e7ad8b29b21ff81a9f6d685fa92dbd3d563d061e6455b59de40bbda79753c1",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/hook-cases-reminder.txt": {
+      "sha": "2c59771b8d25992df79284a90a3a5f765099fbec18aa1c3d4e2de00389127fea",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/README.md": {
+      "sha": "7861ec0b587cd2aec3c793d7d035a559eb676a8785f064487b0afcbcec939532",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/プロジェクト概要.html": {
+      "sha": "7efd96ffa03e5f70ee3be0a14bd81d8a7608d7bfc4fba9f825fc93379a23b723",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/用語.md": {
+      "sha": "d2b8be245c06322a22b94408053bb6731138da0203626af52984d99305346d00",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/設計書/01-overview.md": {
+      "sha": "98be588ccd6b819ffb1c43c3c60de88429cdc5969e55db9fa3bbe0b61aa74bee",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/設計書/02-architecture.md": {
+      "sha": "cad86d0370e31899a1dd58f4d08ca369901937e038c50d921f04683d54f2c039",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/設計書/03-ステークホルダー.md": {
+      "sha": "04e3a00c9b2eea6325416f2c393d4c20dc534c491a4c3a9d0155ac4cebb6c67d",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/設計書/05-セキュリティ設計.md": {
+      "sha": "dc2a1042eb7f7d7ced38271b5f60c561113d7c883827578ab8f4c8fd1c27b198",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/設計書/06-品質設計.md": {
+      "sha": "c7783c223215ec969389eb4dea21a0491fab32ce31503704b7bdbfdb50e632de",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/設計書/07-開発運用設計.md": {
+      "sha": "0ebcbec8185b461b7759368bac2d895b92964758f5784fa3dae77a0d44ee5ede",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/設計書/08-利用者運用設計.md": {
+      "sha": "c818af53e757b32b2a1927afa3a5d5b9b1cdba609b78e7a2348ef8f1192722fc",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/設計書/README.md": {
+      "sha": "62c0d70283aeb89a043b3f462e2cce596d3286971584ba49c1403e09a3d48ab6",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/reminder-fixture/docs/設計書/decisions/README.md": {
+      "sha": "40c8ffbb409ea05480461192805da20dd8400a080932d74736d30cfe04b198de",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/run-all.sh": {
+      "sha": "3bb3b606aad42b8e94f3d668efe27daee751b0701167871835f52e52048e608d",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/run_drops_cases.py": {
+      "sha": "1eb91465c367ce250ac47239f6434b4f296f420e4e21606ba8a8f14bcc23d950",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/tests/skeleton/run_pickup_cases.py": {
+      "sha": "d505287f469dfd3e0ad0e5cc50cc4011d97853e6e433050e6ba691d2c3de1d49",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/work_area_guard.py": {
+      "sha": "d156d06778b666871b72294ba008bb70829549ea4d2129360f173e0c1f5cb5a6",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/work_area_guard.sh": {
+      "sha": "c5ed398c762b7b41db7b53a63e9d999b97b0b1e52197108d6160eba751e257b6",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/hooks/work_log.sh": {
+      "sha": "fa8ca16f2e1aa1f89caf262d58792b0dc774609e1d7fb2f68cb775656b9629f8",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/project.json": {
+      "sha": "18654d5eb108f465e205ba925ef65a5cd9346eeb4da278b4bedc1d656825f39e",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/rules/docs-management.md": {
+      "sha": "8423c28c49b2defde5c0f2d24a9df9de90ab8776e3fe7f43ff162a4c3cf19373",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/rules/secrets.md": {
+      "sha": "bbfb9fcc9aa9979823ce321f7311e24b3eec80c184d255f374e21a80d53a9590",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/rules/work-area.md": {
+      "sha": "d8d4006b97c0ae24e2ef6bda3a97347f30f7d7bcbef52567e09c458312aa6e12",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/settings.json": {
+      "sha": "031e9c8660eb5a91d68e04a64d799564825bfd8a48c0eddf82ef63699d60f630",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/skills/audit-design-docs/SKILL.md": {
+      "sha": "214b65e4a435f323e2ebd03552ce6b712bc0e04ae5783b1d7a8b4a5c565ae3b2",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/skills/draft-from-existing/SKILL.md": {
+      "sha": "1d7f2de7dbd88910163b9f337148674182c3164cc3ec4954a2b19896b29ad98d",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/skills/harness/SKILL.md": {
+      "sha": "3a365928b3397c20fc83d478b6d8a6203b9bc5faaa3b67c03d75276c3d01ea17",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/skills/pickup/SKILL.md": {
+      "sha": "1bcf3a322a18f8485f8e0aa1c7b297108ad84e30d819807c4d052d5b1e9be580",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/skills/scratch/SKILL.md": {
+      "sha": "aae30b0fa953a542e449e4f3d7c0a2ec4c1a70322c8753a40cccc61e565efe47",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/skills/sync-design-docs/SKILL.md": {
+      "sha": "92165efbf1f9e795fb8c79dd43724211cbc73acc101712f57da873fdc287d901",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/skills/task/SKILL.md": {
+      "sha": "6cf9235f9f3d5c7b43c674711211b25d70192af0a9f88d4f7fc62e29ab6488c5",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/skills/update-env-info/SKILL.md": {
+      "sha": "5ef48c46d7e67369339420989f4522a86aa4d68212c3f49ce0ba44b2d96f31a2",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/skills/update-overview/SKILL.md": {
+      "sha": "a968e187fb432635a80663dcb98ae13916202941daf1f7977d366f2c745b791d",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".claude/skills/work-placement/SKILL.md": {
+      "sha": "c8b2669be56cfdce15ff71b5d34d2ad78bea372505d0f9df7a02a5f0de1d3365",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".editorconfig": {
+      "sha": "b66623682b2d50082f1ab070a4381d5f27cfd27a9e667458c9f62a4a79b7bc36",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".env.example": {
+      "sha": "c8e6eea4ad16e3b665a84df049fc430f3d728b3e3a99a3498a4a721186621489",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".gitattributes": {
+      "sha": "9aa481ac29aa1ab96638d620dc497ccd847811f9343cc702623794a90fadc34e",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".gitignore": {
+      "sha": "71d412022b351293f163bba2c261d2ef4e3d920d3106d3ec5581512f3067b337",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".work/README.md": {
+      "sha": "7b99df071dae8ff86b5bde82252b0a12286e30a08bd3dc025bf39a070d76add5",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".work/_bk/.gitkeep": {
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".work/一時/.gitkeep": {
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".work/機密/.gitkeep": {
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    ".work/証跡/.gitkeep": {
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "CHANGELOG.md": {
+      "sha": "e69ee6c7a20a254ed098952e1b3f50def75ae7d55a992a6a046e52d94f9d2042",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "CLAUDE.md": {
+      "sha": "fc090a4acb86fd0e446fff8af8ba1859ba77a98ee94f0ce03fdad26661f3cb4d",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "README.md": {
+      "sha": "71ce408a149aa29d39b4f11ea9234be6b3a986f9a13a7e78238e60cebc6f0aeb",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/README.md": {
+      "sha": "a0276988c310f6eaa67b81e2ddf8be88a7ba0062318b31383b425c65aa3ad0b5",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/ハーネス台帳.md": {
+      "sha": "7f6b5981eb535f8eab098c8a8cf3ba9d07befee4cd922d662961947f83802727",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/プロジェクト概要.html": {
+      "sha": "971d779f07aaf3a6ea8fce3d5e0c2c9f93acf529cbda760e13ac6dd1e5481904",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/README.md": {
+      "sha": "8256bbe7b28d362da097baca2c2271c36d1c2f8d022d3ab3f9b8e54f767050ef",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/areas.json": {
+      "sha": "3c924ba805eb96e7d6867b06de15f81df210f710be561626c93e6e547f113cff",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/build.py": {
+      "sha": "cfe3365ff404201d5ee5eb3777814d9074ca88716fb8c8da1edeba529e3b8fee",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/close.py": {
+      "sha": "37920bdf6e5b6b8f6ba5f27416d93419a24a9476806ec8459846b28404bbc0d3",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/closed/.gitkeep": {
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/index.html": {
+      "sha": "04d3201c149e2c0c758f6c7e5ba28d7d8cd40d7238adec7cc7184c78d6cef039",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/new.py": {
+      "sha": "662ff8bc6a2eac451ddf7cd801eda9ed83d99c02ae4ca505eec47136e0c55904",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/open/.gitkeep": {
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/screen.py": {
+      "sha": "96740c4de0c894686dcd52b1153b2a2dff17ed19e909f1c666a88c96fdb72e0a",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/screens/.gitkeep": {
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/01_タスク管理/詳細仕様.md": {
+      "sha": "f607ccd09ab8c9d49d45bcfaa21c84124ab70206f4ecddffcf98d0dda1e89951",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/02_打合せ/README.md": {
+      "sha": "fbf4cb62097d9c747de8e5811eeb4f241721e2152932d733dc71fa054a8f1c34",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/README.md": {
+      "sha": "0750ccd65c07d73637c782d3db316bf49ed9cda1a1cb60ec9a5964d0e3a56db1",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/案件/確認依頼一覧.md": {
+      "sha": "9560fb2d40dcdafa6f847ca652ed96f5cb6ce5dd48e77b400faf2784c6b2fd80",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/01-概要.md": {
+      "sha": "f5629dc92da9fb55d2a5cbe7c26bfce5c253d305c39804562340a3fb8d0e34aa",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/README.md": {
+      "sha": "240982c4d50959ffcbc11d832f1aa48e036dffd860305c36c7c9eb685958d367",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/decisions/ADR-000-テンプレート.md": {
+      "sha": "2ad7e3657f653635305c81aaf6c6b118a6b62f7dd26e7a47b25af7e1a32ce16d",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/decisions/README.md": {
+      "sha": "b400a6772680566aa34cb01a33fa4afaa449b2b4d804a7442d160a00929b514e",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/runbook/README.md": {
+      "sha": "b7b49912fb859c5f4b025367915c1f6d9d85a64f46c0c3306e8e87fcbd228e61",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/template/02-構成.md": {
+      "sha": "12c068f7e1df68fa8f761111cfcd3a72b896e658cbc9c70d32c30a1c720d4617",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/template/03-関係者.md": {
+      "sha": "14f64154b426b78be2a64f881ac8457ec7658b56629d650c5bd2dcd223198e4f",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/template/04-原則.md": {
+      "sha": "e0ee02e78bca5a0ab6cd57ecafa58f536c566bd05dceba2f1a46dc2e919afacb",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/template/05-セキュリティ.md": {
+      "sha": "0098d3b471697362380c871b4dbba596a042dc9a7097d4976612871fa7345543",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/template/06-品質と確認.md": {
+      "sha": "13e22d489a9e939f1936e5a27b286178f6e0e858410f81054d41a69ed1a91884",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/template/07-変更と反映.md": {
+      "sha": "97cb328fd46ec191bcba0cdd1bf14165758b02ac3d6b7a71ad028d3320ec8188",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/template/08-利用者の運用.md": {
+      "sha": "d249131b09d7d050a276b78443e804a0e226f0fa3d4ef7f9c55f8cc17135dffd",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/template/09-非機能と障害時.md": {
+      "sha": "bac79efc020d6a19ff77dc953e0b70071eee45fc3d5aee6335e3063d795025e7",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "docs/設計書/template/catalog.json": {
+      "sha": "bb500d9d8b0c4d1e93693c47642817a1fa3a73e4bc60010969d93921cb7e2fcb",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/add_doc.py": {
+      "sha": "4c52f7275dfcb6336e0da5925fd56d26dcabed34f48b57432409bdfed11f07b6",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/check_drops.py": {
+      "sha": "43c0f37c3f773a67fab2c4c165c9e269b9071dfb7c61cc5adec143bad8a6f0b7",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/check_skeleton.py": {
+      "sha": "a7246d3a395d6bce43a350d544ed304919a2cbef5e1275b9e755656e0b14e284",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/docs_freshness.py": {
+      "sha": "908148197647ba7cfd207cfe34b5a3223f35d5efa49d11baf5ccc7fc368a72c1",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/_util.py": {
+      "sha": "5227d049ecea0f8bbb3272492db7fecc40c4c0b9a1b050688d12a22ca495c95e",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/run_tests.py": {
+      "sha": "864beacb0f40c7e15c3b88aae566b2178f428eeaa37972b6e532e47cd7111731",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/secret-cases.txt": {
+      "sha": "fa85f96c680414577f5cc8a005aa71b38209864fd70d65cb578eb02537dee3bc",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/test_add_doc.py": {
+      "sha": "8ff36d9971f461d5d3a8561e4a51ec02db91b99375443fd3396e98b9f10e9b5e",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/test_harness.py": {
+      "sha": "ddd9ed95b105b1970c08cf89be339d5b9336ac89ff512433852bfe13bd425efa",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/test_machine_context.py": {
+      "sha": "4fccb900ccf4e1ee580bce549adcd73593776c962e352ba7bbbfb30fba9e7d30",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/test_new_py.py": {
+      "sha": "b52eb7746f2fd172fcbc5ffb885743f3f4024449e3841cecc4113207c35bded5",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/test_phase.py": {
+      "sha": "1b408095f99fb4284c487cbe939546cb3e33d00031eaf6df52e78cbc7b70ea68",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/test_project_config.py": {
+      "sha": "e22b395fea3b1a83efaf68f7cc29e237fb063dc251dcd26e4a2abad6a012e77b",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/test_secrets.py": {
+      "sha": "d71b52d4094b55e48091c06654b663a613b7b4ca5c49a818847ef113e0d66bd8",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/test_skeleton_drift.py": {
+      "sha": "e1754e8c19fba1b501026d9d19be40ef72195b9b15d3305fe0b37ecac3bb8aeb",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/tests/test_work_log.py": {
+      "sha": "8824a38ff43a95d6cc79e6cf8d871b5d280d3f0ef67ba2ff265c7145257445e4",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "scripts/work_log.py": {
+      "sha": "b07eb21bc0b83242e5ba26d15652caacf7c82ba8c8069893c340e3cee7a08a03",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "案件情報.md": {
+      "sha": "bc733470a5649ef6a21abf49851a75e92922cf466eb8a666f4aa2fe1e033db23",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    },
+    "環境情報.md": {
+      "sha": "569755a574aabf68320a17c840976c9bcae4e0853e1d7d89f9e15773561e5342",
+      "commit": "44aff42487d0512b37e3a5dd7ff9c69ff1c2a6f2"
+    }
+  }
+}

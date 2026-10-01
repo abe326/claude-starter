@@ -1,0 +1,26 @@
+# --- Git 管理外の正本（秘密・関係者・日程。.claude/rules/secrets.md）---
+.work/
+環境情報.md
+案件情報.md
+.env
+.env.*
+!.env.example
+.mcp.json
+.claude/settings.local.json
+
+# --- 生成物・OS ---
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+
+# --- 退避・スクラッチ ---
+_bk/
+scratchpad/
+
+# --- ルート直下の散らかし防止（docs/ 配下の areas.json 等には影響しない）---
+/*.png
+/*.log
+/*.sql
+/*.json

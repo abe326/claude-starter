@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>claude-starter タスク管理</title>
+<style>
+/* ===== Reset & Base ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, sans-serif;
+  background: #fafafa;
+  color: #1a1a1a;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.hidden { display: none !important; }
+
+/* ===== Header ===== */
+.header {
+  background: #fff;
+  border-bottom: 1px solid #ececec;
+  padding: 14px 24px 12px;
+  flex-shrink: 0;
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.header-logo {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 0.03em;
+}
+.header-sep { width: 1px; height: 12px; background: #d1d5db; }
+.header-subtitle { font-size: 12px; color: #6b7280; }
+.stats-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat-card {
+  background: #f8f9fa;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-width: 88px;
+}
+.stat-num { font-size: 20px; font-weight: 700; color: #111827; line-height: 1.2; }
+.stat-label { font-size: 11px; color: #6b7280; margin-top: 1px; }
+
+/* ===== Toolbar ===== */
+.toolbar {
+  background: #fff;
+  border-bottom: 1px solid #ececec;
+  padding: 8px 24px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.search-input {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 13px;
+  color: #1a1a1a;
+  background: #fafafa;
+  width: 200px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.1s;
+}
+.search-input::placeholder { color: #9ca3af; }
+.search-input:focus { border-color: #4f46e5; background: #fff; }
+select.filter-select {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 13px;
+  color: #374151;
+  background: #fafafa;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.1s;
+}
+select.filter-select:focus { border-color: #4f46e5; }
+.toolbar-sep { width: 1px; height: 18px; background: #ececec; margin: 0 2px; }
+.toggle-group {
+  display: flex;
+  background: #f3f4f6;
+  border-radius: 6px;
+  padding: 2px;
+}
+.toggle-btn {
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  padding: 4px 11px;
+  font-size: 12px;
+  font-family: inherit;
+  color: #6b7280;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.1s;
+  white-space: nowrap;
+}
+.toggle-btn.active {
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 1px 2px rgba(0,0,0,.06);
+}
+#viewToggle .toggle-btn.active { color: #4338ca; }
+
+/* ===== Main Layout ===== */
+.main { display: flex; flex: 1; overflow: hidden; }
+
+/* ===== List Pane ===== */
+.list-pane {
+  width: 400px;
+  min-width: 260px;
+  border-right: 1px solid #ececec;
+  overflow-y: auto;
+  background: #fff;
+  flex-shrink: 0;
+}
+.group-header {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ececec;
+  padding: 7px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2;
+}
+.group-count {
+  background: #e5e7eb;
+  color: #374151;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.task-row {
+  padding: 10px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background 0.07s;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  outline: none;
+}
+.task-row:hover { background: #f9fafb; }
+.task-row.selected { background: #eef2ff; border-left: 2px solid #4f46e5; }
+.task-row.epic-child { padding-left: 30px; }
+.task-row-top { display: flex; align-items: flex-start; gap: 8px; }
+.task-id {
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: 52px;
+  padding-top: 1px;
+  font-variant-numeric: tabular-nums;
+}
+.task-title {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 500;
+  flex: 1;
+  line-height: 1.45;
+}
+.task-title.closed-title { color: #9ca3af; text-decoration: line-through; }
+.task-row-bottom { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+/* ===== Status Pills（タスク・画面共通） ===== */
+.status-pill {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 9px;
+  white-space: nowrap;
+}
+.s-未着手  { background: #f3f4f6; color: #374151; }
+.s-進行中  { background: #eef2ff; color: #4338ca; }
+.s-実装中  { background: #eef2ff; color: #4338ca; }
+.s-方針確定 { background: #f0fdfa; color: #0f766e; }
+.s-確認待ち { background: #fffbeb; color: #92400e; }
+.s-保留   { background: #f8fafc; color: #64748b; }
+.s-完了   { background: #f0fdf4; color: #166534; }
+
+/* ===== Kind Pill（分類: 課題のみバッジ表示。タスクは無印） ===== */
+.kind-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 9px;
+  white-space: nowrap;
+  background: #fdf2f8;
+  color: #9d174d;
+  border: 1px solid #fbcfe8;
+}
+
+/* ===== Issue Zone（課題専用バンド: リスト上部・タスクグループとは分離表示） ===== */
+.issue-zone {
+  background: #fdf2f8;
+  border: 1px solid #fbcfe8;
+  border-radius: 8px;
+  margin: 8px 8px 12px;
+  padding: 4px 0 6px;
+}
+.issue-zone-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #9d174d;
+}
+.issue-zone-header .group-count { background: #fbcfe8; color: #9d174d; }
+.issue-zone .task-row { border-bottom-color: #fce7f3; }
+.issue-zone .task-row:hover { background: #fce7f3; }
+.issue-zone .task-row.selected { background: #fbcfe8; }
+.issue-zone .kind-pill { display: none; } /* ゾーン内では課題ピルは冗長 */
+
+/* ===== Due chip（期限。期限切れは赤、7 日以内は黄） / 課題を決める人 ===== */
+.due-chip {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  background: #f3f4f6;
+  color: #4b5563;
+}
+.due-chip.overdue { background: #fee2e2; color: #b91c1c; font-weight: 600; }
+.due-chip.soon    { background: #fef9c3; color: #854d0e; font-weight: 600; }
+.decider-label { font-size: 11px; color: #9d174d; white-space: nowrap; }
+
+/* ===== Priority Dot ===== */
+.prio-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.p-最高 { background: #dc2626; }
+.p-高   { background: #ea580c; }
+.p-中   { background: #9ca3af; }
+.p-低   { background: #d1d5db; }
+.prio-label { font-size: 11px; color: #9ca3af; }
+.tag {
+  font-size: 10px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ===== Screen chip（タスク詳細・行に出す画面リンク） ===== */
+.screen-chip {
+  font-size: 11px;
+  font-weight: 500;
+  color: #0f766e;
+  background: #f0fdfa;
+  border: 1px solid #99f6e4;
+  padding: 1px 7px;
+  border-radius: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.screen-chip:hover { background: #ccfbf1; }
+.screen-chip.unknown { color: #9ca3af; background: #f3f4f6; border-color: #e5e7eb; cursor: default; }
+
+/* ===== Screen rows ===== */
+.screen-path {
+  font-size: 11px;
+  color: #6b7280;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+/* ===== Related tasks（画面詳細内） ===== */
+.related-tasks { padding: 16px 28px 0; }
+.related-title { font-size: 12px; font-weight: 600; color: #6b7280; letter-spacing: 0.04em; margin-bottom: 6px; }
+.related-task {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid #f3f4f6;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #111827;
+}
+.related-task:hover { background: #f9fafb; }
+.related-task .task-id { min-width: 48px; }
+.related-task.closed .related-task-title { color: #9ca3af; text-decoration: line-through; }
+.related-task-title { flex: 1; }
+.related-empty { font-size: 12px; color: #9ca3af; }
+
+/* ===== Epic Progress ===== */
+.epic-progress { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+.progress-track { flex: 1; height: 3px; background: #e5e7eb; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #4f46e5; border-radius: 2px; }
+.progress-text { font-size: 10px; color: #9ca3af; white-space: nowrap; }
+
+/* ===== Empty State ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  gap: 10px;
+  color: #9ca3af;
+  text-align: center;
+}
+.empty-box {
+  width: 28px; height: 28px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+}
+.empty-text { font-size: 13px; color: #6b7280; }
+
+/* ===== Detail Pane ===== */
+.detail-pane { flex: 1; overflow-y: auto; background: #fff; }
+.detail-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #d1d5db;
+  font-size: 13px;
+}
+.detail-header {
+  padding: 20px 28px 16px;
+  border-bottom: 1px solid #ececec;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+}
+.detail-id { font-size: 11px; color: #9ca3af; font-weight: 500; margin-bottom: 4px; }
+.detail-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+.detail-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+.detail-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px 16px;
+}
+.meta-item { display: flex; flex-direction: column; gap: 2px; }
+.meta-item.wide { grid-column: 1 / -1; }
+.meta-key {
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.meta-val { font-size: 12px; color: #374151; font-weight: 500; }
+.meta-val.chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.detail-body { padding: 20px 28px 48px; }
+
+/* ===== Markdown Content ===== */
+.md h1, .md h2, .md h3, .md h4 {
+  color: #111827;
+  margin: 20px 0 8px;
+  line-height: 1.35;
+}
+.md h1:first-child, .md h2:first-child { margin-top: 0; }
+.md h1 { font-size: 17px; font-weight: 700; }
+.md h2 {
+  font-size: 14px; font-weight: 700;
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 5px;
+}
+.md h3 { font-size: 13px; font-weight: 600; }
+.md h4 { font-size: 13px; font-weight: 600; color: #374151; }
+.md p { font-size: 13px; line-height: 1.75; color: #374151; margin: 8px 0; }
+.md ul, .md ol {
+  margin: 8px 0 8px 20px;
+  font-size: 13px;
+  line-height: 1.75;
+  color: #374151;
+}
+.md li { margin: 2px 0; }
+.md li ul, .md li ol { margin: 2px 0 2px 16px; }
+.md code {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+.md pre {
+  background: #f8f9fa;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+.md pre code {
+  background: none;
+  padding: 0;
+  font-size: 12px;
+  color: #374151;
+}
+.md table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 12px; }
+.md th, .md td { border: 1px solid #ececec; padding: 6px 12px; text-align: left; color: #374151; }
+.md th { background: #f8f9fa; font-weight: 600; color: #111827; }
+.md hr { border: none; border-top: 1px solid #ececec; margin: 16px 0; }
+.md blockquote {
+  margin: 10px 0; padding: 8px 14px;
+  border-left: 3px solid #d1d5db; background: #fafafa;
+  border-radius: 0 4px 4px 0; color: #4b5563;
+}
+.md blockquote > :first-child { margin-top: 0; }
+.md blockquote > :last-child { margin-bottom: 0; }
+.md blockquote p { color: #4b5563; }
+.md .md-check { margin-right: 6px; color: #9ca3af; }
+.md .md-check.done { color: #16a34a; }
+.md del { color: #9ca3af; }
+.md a { color: #4f46e5; text-decoration: none; }
+.md a:hover { text-decoration: underline; }
+.md strong { font-weight: 600; color: #111827; }
+.md em { font-style: italic; }
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ===== Responsive ===== */
+@media (max-width: 720px) {
+  body { overflow: auto; }
+  .main { flex-direction: column; overflow: visible; }
+  .list-pane { width: 100%; border-right: none; border-bottom: 1px solid #ececec; overflow-y: visible; }
+  .detail-pane { overflow: visible; min-height: 400px; }
+  .search-input { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-top">
+    <span class="header-logo">claude-starter</span>
+    <div class="header-sep"></div>
+    <span class="header-subtitle">タスク管理</span>
+  </div>
+  <div class="stats-row" id="statsRow"></div>
+</header>
+
+<div class="toolbar" id="toolbar">
+  <div class="toggle-group" id="viewToggle">
+    <button class="toggle-btn active" data-val="task">タスク</button>
+    <button class="toggle-btn" data-val="screen">画面</button>
+  </div>
+
+  <div class="toolbar-sep"></div>
+
+  <input type="text" class="search-input" id="searchInput"
+    placeholder="ID・タイトル・本文で検索...">
+
+  <select class="filter-select" id="areaFilter" data-view="task">
+    <option value="">すべての領域</option>
+  </select>
+
+  <select class="filter-select" id="statusFilter" data-view="task">
+    <option value="">すべての状態</option>
+    <option>未着手</option>
+    <option>進行中</option>
+    <option>方針確定</option>
+    <option>確認待ち</option>
+    <option>保留</option>
+    <option>完了</option>
+  </select>
+
+  <select class="filter-select" id="priorityFilter" data-view="task">
+    <option value="">すべての優先度</option>
+    <option>最高</option>
+    <option>高</option>
+    <option>中</option>
+    <option>低</option>
+  </select>
+
+  <div class="toolbar-sep" data-view="task"></div>
+
+  <div class="toggle-group" id="stateToggle" data-view="task">
+    <button class="toggle-btn active" data-val="open">OPEN</button>
+    <button class="toggle-btn" data-val="closed">CLOSED</button>
+    <button class="toggle-btn" data-val="all">すべて</button>
+  </div>
+
+  <div class="toolbar-sep" data-view="task"></div>
+
+  <div class="toggle-group" id="groupToggle" data-view="task">
+    <button class="toggle-btn active" data-val="area">領域別</button>
+    <button class="toggle-btn" data-val="epic">エピック別</button>
+  </div>
+
+  <select class="filter-select" id="sortSelect" data-view="task" title="並び順（課題のバンドは常に期限の近い順）">
+    <option value="id">ID 順</option>
+    <option value="due">期限の近い順</option>
+  </select>
+</div>
+
+<div class="main">
+  <div class="list-pane" id="listPane"></div>
+  <div class="detail-pane" id="detailPane">
+    <div class="detail-placeholder">タスクを選択してください</div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     Utilities
+  ============================================================ */
+
+  /** HTML-escape a value */
+  function esc(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ============================================================
+     Data
+  ============================================================ */
+
+  const ALL_TASKS   = Array.isArray(window.TASKS)   ? window.TASKS   : [];
+  const ALL_SCREENS = Array.isArray(window.SCREENS) ? window.SCREENS : [];
+  const SCREEN_BY_ID = {};
+  ALL_SCREENS.forEach(s => { SCREEN_BY_ID[s.id] = s; });
+
+  /* ============================================================
+     App State
+  ============================================================ */
+
+  let view             = 'task';   // 'task' | 'screen'
+  let stateFilter      = 'open';
+  let groupBy          = 'area';
+  let searchQ          = '';
+  let areaVal          = '';
+  let statusVal        = '';
+  let priorityVal      = '';
+  let sortBy           = 'id';     // 'id' | 'due'
+  let selectedId       = null;     // 選択中タスク ID
+  let selectedScreenId = null;     // 選択中画面 ID
+
+  /* ============================================================
+     Stats
+  ============================================================ */
+
+  function renderStats() {
+    const open       = ALL_TASKS.filter(t => t.state === 'open').length;
+    const closed     = ALL_TASKS.filter(t => t.state === 'closed').length;
+    const pending    = ALL_TASKS.filter(t => t.status === '確認待ち').length;
+    const issues     = ALL_TASKS.filter(t => t.state === 'open' && t.kind === '課題').length;
+    const areas      = new Set(ALL_TASKS.map(t => t.area).filter(Boolean)).size;
+    const scrDone    = ALL_SCREENS.filter(s => s.status === '完了').length;
+
+    document.getElementById('statsRow').innerHTML = [
+      { num: open,   label: 'OPEN' },
+      { num: closed, label: 'CLOSED' },
+      { num: issues, label: '課題（open）' },
+      { num: pending,label: '確認待ち' },
+      { num: areas,  label: '領域数' },
+      { num: `${scrDone} / ${ALL_SCREENS.length}`, label: '画面 完了' },
+    ].map(c =>
+      `<div class="stat-card">
+         <div class="stat-num">${esc(c.num)}</div>
+         <div class="stat-label">${c.label}</div>
+       </div>`
+    ).join('');
+  }
+
+  /* ============================================================
+     Area Filter Options
+  ============================================================ */
+
+  function populateAreaFilter() {
+    const areas = [...new Set(ALL_TASKS.map(t => t.area).filter(Boolean))].sort(
+      (a, b) => a.localeCompare(b, 'ja')
+    );
+    const sel = document.getElementById('areaFilter');
+    areas.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a;
+      sel.appendChild(opt);
+    });
+  }
+
+  /* ============================================================
+     Filtering
+  ============================================================ */
+
+  function getFiltered() {
+    const q = searchQ.toLowerCase();
+    return ALL_TASKS.filter(t => {
+      if (stateFilter !== 'all' && t.state !== stateFilter) return false;
+      if (areaVal    && t.area     !== areaVal)    return false;
+      if (statusVal  && t.status   !== statusVal)  return false;
+      if (priorityVal && t.priority !== priorityVal) return false;
+      if (q) {
+        const inId    = (t.id    || '').toLowerCase().includes(q);
+        const inTitle = (t.title || '').toLowerCase().includes(q);
+        const inBody  = (t.body  || '').toLowerCase().includes(q);
+        if (!inId && !inTitle && !inBody) return false;
+      }
+      return true;
+    });
+  }
+
+  function getFilteredScreens() {
+    const q = searchQ.toLowerCase();
+    if (!q) return ALL_SCREENS.slice();
+    return ALL_SCREENS.filter(s =>
+      (s.id   || '').toLowerCase().includes(q) ||
+      (s.name || '').toLowerCase().includes(q) ||
+      (s.path || '').toLowerCase().includes(q) ||
+      (s.body || '').toLowerCase().includes(q)
+    );
+  }
+
+  /* ============================================================
+     Grouping helpers
+  ============================================================ */
+
+  function groupByArea(list) {
+    const map = {};
+    list.forEach(t => {
+      const k = t.area || '未分類';
+      (map[k] = map[k] || []).push(t);
+    });
+    return Object.entries(map).sort((a, b) => a[0].localeCompare(b[0], 'ja'));
+  }
+
+  function groupByEpic(list) {
+    const map = {};
+    list.forEach(t => {
+      const k = t.epic || 'その他';
+      (map[k] = map[k] || []).push(t);
+    });
+    return Object.entries(map).sort((a, b) => {
+      if (a[0] === 'その他') return 1;
+      if (b[0] === 'その他') return -1;
+      return a[0].localeCompare(b[0]);
+    });
+  }
+
+  /* 画面は status 別にグループ化（表示順は固定） */
+  const SCREEN_STATUS_ORDER = ['実装中', '確認待ち', '未着手', '保留', '完了'];
+
+  function groupScreensByStatus(list) {
+    const map = {};
+    list.forEach(s => {
+      const k = s.status || '未設定';
+      (map[k] = map[k] || []).push(s);
+    });
+    return Object.entries(map).sort((a, b) => {
+      const ia = SCREEN_STATUS_ORDER.indexOf(a[0]);
+      const ib = SCREEN_STATUS_ORDER.indexOf(b[0]);
+      return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    });
+  }
+
+  /* Determine if a task is an epic parent (-00 suffix) */
+  function isEpicParent(t) {
+    return Boolean(t.epic && /-00$/.test(t.id));
+  }
+
+  /* Compute children progress for an epic parent */
+  function epicProgress(t) {
+    // Children: same epic, id prefix matches (strip -00 suffix → prefix)
+    const prefix = t.id.replace(/-00$/, '');
+    const children = ALL_TASKS.filter(c => c.epic === t.epic && c.id !== t.id && c.id.startsWith(prefix));
+    if (children.length === 0) return null;
+    const done = children.filter(c => c.state === 'closed' || c.status === '完了').length;
+    return { done, total: children.length, pct: Math.round(done / children.length * 100) };
+  }
+
+  /* ============================================================
+     Task Row HTML
+  ============================================================ */
+
+  const PRIO_DOT = { '最高': 'p-最高', '高': 'p-高', '中': 'p-中', '低': 'p-低' };
+  const PRIO_RANK = { '最高': 0, '高': 1, '中': 2, '低': 3 };
+
+  /* 期限（due: YYYY-MM-DD・任意） */
+  const TODAY = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })();
+
+  function parseDue(s) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s || '')) return null;
+    const d = new Date(s + 'T00:00:00');
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function dueClass(t) {
+    const d = parseDue(t.due);
+    if (!d || t.state === 'closed') return '';
+    const days = Math.round((d - TODAY) / 86400000);
+    if (days < 0) return 'overdue';
+    if (days <= 7) return 'soon';
+    return '';
+  }
+
+  function dueChip(t) {
+    if (!t.due) return '';
+    const c = dueClass(t);
+    const label = c === 'overdue' ? '期限切れ ' : '期限 ';
+    return `<span class="due-chip ${c}" title="期限（due）">${label}${esc(t.due)}</span>`;
+  }
+
+  /** 期限の近い順（期限なしは後ろ）。同じなら 0 */
+  function byDue(a, b) {
+    const da = parseDue(a.due), db = parseDue(b.due);
+    if (da && db) return da - db;
+    if (da) return -1;
+    if (db) return 1;
+    return 0;
+  }
+
+  function byPriority(a, b) {
+    return (PRIO_RANK[a.priority] ?? 9) - (PRIO_RANK[b.priority] ?? 9);
+  }
+
+  function byId(a, b) {
+    return (a.id || '').localeCompare(b.id || '', 'ja', { numeric: true });
+  }
+
+  function sortTasks(list) {
+    return sortBy === 'due' ? list.slice().sort((a, b) => byDue(a, b) || byId(a, b)) : list;
+  }
+
+  function screenChip(scrId) {
+    const s = SCREEN_BY_ID[scrId];
+    if (!s) return `<span class="screen-chip unknown" title="screens/ に未定義">${esc(scrId)}</span>`;
+    return `<span class="screen-chip" data-scr="${esc(scrId)}" title="${esc(s.path || '')}">${esc(scrId)} ${esc(s.name)}</span>`;
+  }
+
+  function buildTaskRow(t, isChild, showProgress) {
+    const selCls    = t.id === selectedId ? 'selected' : '';
+    const childCls  = isChild ? 'epic-child' : '';
+    const closedCls = t.state === 'closed' ? 'closed-title' : '';
+
+    const prioClass = PRIO_DOT[t.priority] || 'p-中';
+    const tags = (t.tags || [])
+      .map(tag => `<span class="tag">${esc(tag)}</span>`)
+      .join('');
+    const screens = (t.screens || [])
+      .map(id => `<span class="tag">${esc(id)}</span>`)
+      .join('');
+
+    let progressHTML = '';
+    if (showProgress) {
+      const prog = epicProgress(t);
+      if (prog) {
+        progressHTML = `
+          <div class="epic-progress">
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${prog.pct}%"></div>
+            </div>
+            <span class="progress-text">${prog.done}/${prog.total}</span>
+          </div>`;
+      }
+    }
+
+    return `<div class="task-row ${selCls} ${childCls}"
+              data-id="${esc(t.id)}"
+              role="button" tabindex="0"
+              aria-selected="${t.id === selectedId}">
+      <div class="task-row-top">
+        <span class="task-id">${esc(t.id)}</span>
+        <span class="task-title ${closedCls}">${esc(t.title)}</span>
+      </div>
+      <div class="task-row-bottom">
+        ${(t.kind === '課題') ? '<span class="kind-pill">課題</span>' : ''}
+        <span class="status-pill s-${esc(t.status)}">${esc(t.status)}</span>
+        <span class="prio-dot ${prioClass}" title="${esc(t.priority || '中')}"></span>
+        <span class="prio-label">${esc(t.priority || '')}</span>
+        ${dueChip(t)}
+        ${(t.kind === '課題' && t.decider) ? `<span class="decider-label" title="決める人（decider）">決める: ${esc(t.decider)}</span>` : ''}
+        ${tags}${screens}
+      </div>
+      ${progressHTML}
+    </div>`;
+  }
+
+  function buildScreenRow(s) {
+    const selCls = s.id === selectedScreenId ? 'selected' : '';
+    const tasks  = s.tasks || [];
+    const openN  = tasks.filter(x => x.state === 'open').length;
+    const tags = (s.tags || [])
+      .map(tag => `<span class="tag">${esc(tag)}</span>`)
+      .join('');
+    return `<div class="task-row ${selCls}"
+              data-id="${esc(s.id)}"
+              role="button" tabindex="0"
+              aria-selected="${s.id === selectedScreenId}">
+      <div class="task-row-top">
+        <span class="task-id">${esc(s.id)}</span>
+        <span class="task-title">${esc(s.name)}</span>
+      </div>
+      <div class="task-row-bottom">
+        <span class="status-pill s-${esc(s.status)}">${esc(s.status || '未設定')}</span>
+        <span class="screen-path">${esc(s.path || '')}</span>
+        <span class="prio-label">タスク ${openN} open / ${tasks.length}</span>
+        ${tags}
+      </div>
+    </div>`;
+  }
+
+  /* ============================================================
+     Render List
+  ============================================================ */
+
+  function renderList() {
+    if (view === 'screen') { renderScreenList(); return; }
+
+    const filtered = getFiltered();
+    const pane = document.getElementById('listPane');
+
+    if (filtered.length === 0) {
+      pane.innerHTML = `<div class="empty-state">
+        <div class="empty-box"></div>
+        <div class="empty-text">タスクがありません</div>
+      </div>`;
+      return;
+    }
+
+    // 課題はタスクと同列に並べず、リスト上部の専用バンドに分離表示
+    // 課題バンドは常に「期限の近い順（期限なしは後ろ）→ 優先度 → ID」
+    const issues   = filtered.filter(t => t.kind === '課題')
+      .sort((a, b) => byDue(a, b) || byPriority(a, b) || byId(a, b));
+    const taskRows = sortTasks(filtered.filter(t => t.kind !== '課題'));
+
+    let html = '';
+
+    if (issues.length > 0) {
+      html += `<div class="issue-zone">
+        <div class="issue-zone-header">⚑ 課題（意思決定待ち）<span class="group-count">${issues.length}</span></div>`;
+      issues.forEach(t => { html += buildTaskRow(t, false, false); });
+      html += `</div>`;
+    }
+
+    if (groupBy === 'area') {
+      groupByArea(taskRows).forEach(([area, group]) => {
+        html += `<div class="group-header">${esc(area)}<span class="group-count">${group.length}</span></div>`;
+        group.forEach(t => { html += buildTaskRow(t, false, false); });
+      });
+
+    } else {
+      // Epic grouping: parent (-00) first, children indented with progress bar on parent
+      groupByEpic(taskRows).forEach(([epic, group]) => {
+        html += `<div class="group-header">${esc(epic)}<span class="group-count">${group.length}</span></div>`;
+
+        if (epic !== 'その他') {
+          const parents  = group.filter(t => isEpicParent(t));
+          const children = group.filter(t => !isEpicParent(t)).sort(
+            (a, b) => (sortBy === 'due' ? byDue(a, b) : 0) || a.id.localeCompare(b.id)
+          );
+          parents.forEach(t  => { html += buildTaskRow(t, false, true);  });
+          children.forEach(t => { html += buildTaskRow(t, true,  false); });
+        } else {
+          group.forEach(t => { html += buildTaskRow(t, false, false); });
+        }
+      });
+    }
+
+    pane.innerHTML = html;
+    wireRows(pane, selectTask);
+  }
+
+  function renderScreenList() {
+    const filtered = getFilteredScreens();
+    const pane = document.getElementById('listPane');
+
+    if (filtered.length === 0) {
+      pane.innerHTML = `<div class="empty-state">
+        <div class="empty-box"></div>
+        <div class="empty-text">${ALL_SCREENS.length ? '該当する画面がありません' : '画面がありません（screen.py new で作成）'}</div>
+      </div>`;
+      return;
+    }
+
+    let html = '';
+    groupScreensByStatus(filtered).forEach(([status, group]) => {
+      html += `<div class="group-header">${esc(status)}<span class="group-count">${group.length}</span></div>`;
+      group.forEach(s => { html += buildScreenRow(s); });
+    });
+    pane.innerHTML = html;
+    wireRows(pane, selectScreen);
+  }
+
+  /** 行クリック／Enter で選択。選択行をスクロール表示 */
+  function wireRows(pane, onSelect) {
+    pane.querySelectorAll('.task-row').forEach(row => {
+      row.addEventListener('click', () => onSelect(row.dataset.id));
+      row.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect(row.dataset.id);
+        }
+      });
+    });
+    const sel = pane.querySelector('.task-row.selected');
+    if (sel) sel.scrollIntoView({ block: 'nearest' });
+  }
+
+  /* ============================================================
+     Selection / View switch
+  ============================================================ */
+
+  function selectTask(id) {
+    selectedId = id;
+    renderList();
+    renderDetail();
+  }
+
+  function selectScreen(id) {
+    selectedScreenId = id;
+    renderList();
+    renderDetail();
+  }
+
+  function setToggle(groupId, val) {
+    document.querySelectorAll(`#${groupId} .toggle-btn`).forEach(b => {
+      b.classList.toggle('active', b.dataset.val === val);
+    });
+  }
+
+  function switchView(v) {
+    view = v;
+    setToggle('viewToggle', v);
+    document.querySelectorAll('#toolbar [data-view="task"]').forEach(el => {
+      el.classList.toggle('hidden', v !== 'task');
+    });
+    document.getElementById('searchInput').placeholder =
+      v === 'screen' ? 'ID・画面名・パス・本文で検索...' : 'ID・タイトル・本文で検索...';
+    renderList();
+    renderDetail();
+  }
+
+  /** 画面詳細からタスクへ飛ぶ。OPEN/CLOSED フィルタで隠れる場合は「すべて」に切り替える */
+  function jumpToTask(id) {
+    const t = ALL_TASKS.find(x => x.id === id);
+    if (t && stateFilter !== 'all' && t.state !== stateFilter) {
+      stateFilter = 'all';
+      setToggle('stateToggle', 'all');
+    }
+    selectedId = id;
+    switchView('task');
+  }
+
+  function jumpToScreen(id) {
+    if (!SCREEN_BY_ID[id]) return;
+    selectedScreenId = id;
+    switchView('screen');
+  }
+
+  /* ============================================================
+     Render Detail
+  ============================================================ */
+
+  function renderDetail() {
+    if (view === 'screen') { renderScreenDetail(); return; }
+    const pane = document.getElementById('detailPane');
+
+    if (!selectedId) {
+      pane.innerHTML = '<div class="detail-placeholder">タスクを選択してください</div>';
+      return;
+    }
+
+    const t = ALL_TASKS.find(x => x.id === selectedId);
+    if (!t) {
+      pane.innerHTML = '<div class="detail-placeholder">タスクが見つかりません</div>';
+      return;
+    }
+
+    const prioClass = PRIO_DOT[t.priority] || 'p-中';
+    const tags = (t.tags || [])
+      .map(tag => `<span class="tag">${esc(tag)}</span>`)
+      .join('');
+    const screens = (t.screens || []).map(screenChip).join('');
+
+    const metaItems = [
+      { key: '分類',    val: (t.kind === '課題')
+                              ? '<span class="kind-pill">課題</span>'
+                              : esc(t.kind || 'タスク') },
+      { key: '状態',    val: `<span class="status-pill s-${esc(t.status)}">${esc(t.status)}</span>` },
+      { key: '優先度',  val: `<span style="display:flex;align-items:center;gap:5px">
+                                <span class="prio-dot ${prioClass}"></span>${esc(t.priority||'—')}
+                              </span>` },
+      { key: '領域',    val: esc(t.area   || '—') },
+      { key: 'エピック', val: esc(t.epic   || '—') },
+      { key: '担当',    val: esc(t.owner  || '—') },
+      { key: '期限',    val: t.due ? dueChip(t) : '—' },
+      ...((t.kind === '課題') ? [{ key: '決める', val: esc(t.decider || '—') }] : []),
+      { key: '出典',    val: esc(t.source || '—') },
+      { key: '作成日',  val: esc(t.created || '—') },
+      { key: '更新日',  val: esc(t.updated || '—') },
+      { key: 'クローズ日', val: esc(t.closed || '—') },
+      { key: '画面',    val: screens || '—', wide: true, chips: true },
+    ];
+
+    pane.innerHTML = `
+      <div class="detail-header">
+        <div class="detail-id">${esc(t.id)}</div>
+        <div class="detail-title">${esc(t.title)}</div>
+        ${tags ? `<div class="detail-tags">${tags}</div>` : ''}
+        <div class="detail-meta-grid">
+          ${metaItems.map(m =>
+            `<div class="meta-item ${m.wide ? 'wide' : ''}">
+               <div class="meta-key">${m.key}</div>
+               <div class="meta-val ${m.chips ? 'chips' : ''}">${m.val}</div>
+             </div>`
+          ).join('')}
+        </div>
+      </div>
+      <div class="detail-body">
+        <div class="md">${renderMarkdown(t.body || '')}</div>
+      </div>`;
+
+    pane.querySelectorAll('.screen-chip[data-scr]').forEach(el => {
+      el.addEventListener('click', () => jumpToScreen(el.dataset.scr));
+    });
+  }
+
+  function renderScreenDetail() {
+    const pane = document.getElementById('detailPane');
+
+    if (!selectedScreenId) {
+      pane.innerHTML = '<div class="detail-placeholder">画面を選択してください</div>';
+      return;
+    }
+    const s = SCREEN_BY_ID[selectedScreenId];
+    if (!s) {
+      pane.innerHTML = '<div class="detail-placeholder">画面が見つかりません</div>';
+      return;
+    }
+
+    const tags = (s.tags || [])
+      .map(tag => `<span class="tag">${esc(tag)}</span>`)
+      .join('');
+    const metaItems = [
+      { key: 'パス',   val: `<span class="screen-path">${esc(s.path || '—')}</span>` },
+      { key: '状態',   val: `<span class="status-pill s-${esc(s.status)}">${esc(s.status || '未設定')}</span>` },
+      { key: '担当',   val: esc(s.owner || '—') },
+      { key: '作成日', val: esc(s.created || '—') },
+      { key: '更新日', val: esc(s.updated || '—') },
+    ];
+
+    const tasks = s.tasks || [];
+    const related = tasks.length
+      ? tasks.map(t => `
+          <div class="related-task ${t.state === 'closed' ? 'closed' : ''}" data-id="${esc(t.id)}" role="button" tabindex="0">
+            <span class="task-id">${esc(t.id)}</span>
+            <span class="related-task-title">${esc(t.title)}</span>
+            ${(t.kind === '課題') ? '<span class="kind-pill">課題</span>' : ''}
+            <span class="status-pill s-${esc(t.status)}">${esc(t.status)}</span>
+          </div>`).join('')
+      : '<div class="related-empty">関連タスクなし（タスクの frontmatter `screens:` にこの ID を書くと表示されます）</div>';
+
+    pane.innerHTML = `
+      <div class="detail-header">
+        <div class="detail-id">${esc(s.id)}</div>
+        <div class="detail-title">${esc(s.name)}</div>
+        ${tags ? `<div class="detail-tags">${tags}</div>` : ''}
+        <div class="detail-meta-grid">
+          ${metaItems.map(m =>
+            `<div class="meta-item">
+               <div class="meta-key">${m.key}</div>
+               <div class="meta-val">${m.val}</div>
+             </div>`
+          ).join('')}
+        </div>
+      </div>
+      <div class="related-tasks">
+        <div class="related-title">関連タスク（${tasks.filter(t => t.state === 'open').length} open / ${tasks.length}）</div>
+        ${related}
+      </div>
+      <div class="detail-body">
+        <div class="md">${renderMarkdown(s.body || '')}</div>
+      </div>`;
+
+    pane.querySelectorAll('.related-task').forEach(el => {
+      el.addEventListener('click', () => jumpToTask(el.dataset.id));
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jumpToTask(el.dataset.id); }
+      });
+    });
+  }
+
+  /* ============================================================
+     Markdown Renderer (dependency-free, XSS-safe)
+  ============================================================ */
+
+  function renderMarkdown(md) {
+    if (!md || !md.trim()) {
+      return '<p style="color:#9ca3af;font-size:13px">本文なし</p>';
+    }
+
+    // Phase 1: Extract code fences, replace with placeholders
+    const fences = [];
+    const withPlaceholders = md.replace(
+      /```(\w*)\r?\n([\s\S]*?)```/g,
+      (_, lang, code) => {
+        fences.push({ lang, code });
+        return `\x00FENCE${fences.length - 1}\x00`;
+      }
+    );
+
+    // Phase 2: Process text segments
+    const html = processBlocks(withPlaceholders);
+
+    // Phase 3: Restore code fences
+    return html.replace(/\x00FENCE(\d+)\x00/g, (_, i) => {
+      const { code } = fences[Number(i)];
+      return `<pre><code>${esc(code)}</code></pre>`;
+    });
+  }
+
+  /** Process block-level markdown */
+  function processBlocks(text) {
+    const lines = text.split('\n');
+    let html = '';
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i];
+
+      // Heading: # text
+      const hm = line.match(/^(#{1,4})\s+(.+)/);
+      if (hm) {
+        const lvl = Math.min(hm[1].length, 4);
+        html += `<h${lvl}>${inline(hm[2])}</h${lvl}>`;
+        i++; continue;
+      }
+
+      // Horizontal rule: ---+
+      if (line.match(/^---+\s*$/)) {
+        html += '<hr>';
+        i++; continue;
+      }
+
+      // Table: line starts with |, next non-separator line also starts with |
+      if (line.trimStart().startsWith('|')) {
+        const tableLines = [];
+        while (i < lines.length && lines[i].trimStart().startsWith('|')) {
+          tableLines.push(lines[i]);
+          i++;
+        }
+        html += processTable(tableLines);
+        continue;
+      }
+
+      // Unordered list: - or *
+      // ※ 開始条件は継続条件・段落打ち切り条件と同じ {0,4} に揃える。
+      //    ズレていると 4スペースインデントのリスト行で i が進まず無限ループする。
+      if (line.match(/^[ \t]{0,4}[-*]\s+/)) {
+        const listLines = [];
+        // 箇条書き記号を持たないインデント行は項目の折り返しとして取り込む
+        // （取り込まないと <li> の外に別段落として飛び出す）
+        while (i < lines.length &&
+               (lines[i].match(/^[ \t]{0,4}[-*]\s+/) ||
+                (listLines.length && lines[i].match(/^[ \t]+\S/)))) {
+          listLines.push(lines[i]);
+          i++;
+        }
+        html += processUL(listLines);
+        continue;
+      }
+
+      // Ordered list: 1. text
+      if (line.match(/^\d+\.\s+/)) {
+        const listLines = [];
+        while (i < lines.length &&
+               (lines[i].match(/^\d+\.\s+/) ||
+                (listLines.length && lines[i].match(/^[ \t]+\S/)))) {
+          listLines.push(lines[i]);
+          i++;
+        }
+        html += processOL(listLines);
+        continue;
+      }
+
+      // Blockquote: > text（引用内の段落・リスト・表は processBlocks を再帰して処理）
+      if (line.match(/^[ \t]{0,3}>/)) {
+        const bqLines = [];
+        while (i < lines.length && lines[i].match(/^[ \t]{0,3}>/)) {
+          bqLines.push(lines[i].replace(/^[ \t]{0,3}>[ \t]?/, ''));
+          i++;
+        }
+        html += `<blockquote>${processBlocks(bqLines.join('\n'))}</blockquote>`;
+        continue;
+      }
+
+      // Blank line
+      if (line.trim() === '') { i++; continue; }
+
+      // Paragraph: collect until blank or block-start
+      const paraLines = [];
+      while (i < lines.length) {
+        const l = lines[i];
+        if (l.trim() === '') break;
+        if (l.match(/^#{1,4}\s/)) break;
+        if (l.match(/^---+\s*$/)) break;
+        if (l.trimStart().startsWith('|')) break;
+        if (l.match(/^[ \t]{0,4}[-*]\s+/)) break;
+        if (l.match(/^\d+\.\s+/)) break;
+        if (l.match(/^[ \t]{0,3}>/)) break;
+        paraLines.push(l);
+        i++;
+      }
+      if (paraLines.length) {
+        // 改行→<br> の置換は inline()（先頭で esc する）の“後”に行う。
+        // 先に入れると <br> ごとエスケープされ、画面に "<br>" が文字列で出る。
+        html += `<p>${inline(paraLines.join('\n')).replace(/\n/g, '<br>')}</p>`;
+      } else {
+        // どのブロックにも該当せず1行も消費できなかった場合の前進保証。
+        // これが無いと i が進まずブラウザのタブごとフリーズする（保険）。
+        i++;
+      }
+    }
+
+    return html;
+  }
+
+  /** Render a table from lines */
+  function processTable(lines) {
+    // Skip separator lines: |---|---|
+    const rows = lines.filter(l => !l.match(/^\|[\s\-:|]+\|$/));
+    if (!rows.length) return '';
+
+    let html = '<table>';
+    rows.forEach((row, idx) => {
+      // Split on | and trim; first/last empty segments from leading/trailing |
+      const cells = row.split('|').slice(1, -1).map(c => inline(c.trim()));
+      if (idx === 0) {
+        html += '<thead><tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+      } else {
+        html += '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+      }
+    });
+    html += '</tbody></table>';
+    return html;
+  }
+
+  /** Render unordered list (1 level nesting) */
+  function processUL(lines) {
+    // 行を項目単位に畳む。箇条書き記号を持たない行は直前項目の折り返しとして連結する。
+    const items = [];
+    lines.forEach(line => {
+      const m = line.match(/^([ \t]*)[-*]\s+(.*)$/);
+      if (m) {
+        items.push({ nested: /^[ \t]{2,}/.test(m[1]), text: m[2] });
+      } else if (items.length) {
+        items[items.length - 1].text += '\n' + line.trim();
+      }
+    });
+
+    let html = '<ul>';
+    let nested = false;
+    items.forEach(it => {
+      if (it.nested && !nested) { html += '<ul>'; nested = true; }
+      if (!it.nested && nested) { html += '</ul>'; nested = false; }
+      html += `<li>${liItem(it.text).replace(/\n/g, '<br>')}</li>`;
+    });
+    if (nested) html += '</ul>';
+    html += '</ul>';
+    return html;
+  }
+
+  /** リスト項目の先頭 `[ ]` / `[x]` をチェックボックス表示に変換する */
+  function liItem(text) {
+    const m = text.match(/^\[([ xX])\]\s+([\s\S]*)$/);
+    if (!m) return inline(text);
+    const done = m[1].toLowerCase() === 'x';
+    return `<span class="md-check${done ? ' done' : ''}">${done ? '☑' : '☐'}</span>${inline(m[2])}`;
+  }
+
+  /** Render ordered list */
+  function processOL(lines) {
+    const items = [];
+    lines.forEach(line => {
+      const m = line.match(/^\d+\.\s+(.*)$/);
+      if (m) items.push(m[1]);
+      else if (items.length) items[items.length - 1] += '\n' + line.trim();
+    });
+    let html = '<ol>';
+    items.forEach(t => {
+      html += `<li>${liItem(t).replace(/\n/g, '<br>')}</li>`;
+    });
+    html += '</ol>';
+    return html;
+  }
+
+  /** Process inline markdown (called on already-plaintext fragments) */
+  function inline(text) {
+    // Escape HTML first to prevent XSS
+    let s = esc(text);
+
+    // Code spans: `code` (must be before bold/italic to avoid nesting issues)
+    // We use placeholders to protect them
+    const codeSpans = [];
+    s = s.replace(/`([^`]+)`/g, (_, c) => {
+      codeSpans.push(c);
+      return `\x01CODE${codeSpans.length - 1}\x01`;
+    });
+
+    // Strikethrough: ~~text~~
+    s = s.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+
+    // Bold: **text**
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+    // Italic: *text*
+    s = s.replace(/\*([^*\s][^*]*[^*\s]|\S)\*/g, '<em>$1</em>');
+
+    // Links: [text](url)  — url was already esc'd so & → &amp; which is fine in href
+    // スキームは http/https/mailto と相対パスのみ許可（javascript: 等は素通しさせない）
+    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, label, url) => {
+      const scheme = url.match(/^([a-zA-Z][a-zA-Z0-9+.-]*):/);
+      if (scheme && !/^(https?|mailto)$/i.test(scheme[1])) return m;
+      return `<a href="${url}" target="_blank" rel="noopener">${label}</a>`;
+    });
+
+    // Restore code spans
+    s = s.replace(/\x01CODE(\d+)\x01/g,
+      (_, i) => `<code>${codeSpans[Number(i)]}</code>`);
+
+    return s;
+  }
+
+  /* ============================================================
+     Toolbar Wiring
+  ============================================================ */
+
+  function wireToolbar() {
+    document.getElementById('searchInput').addEventListener('input', e => {
+      searchQ = e.target.value;
+      renderList();
+    });
+
+    document.getElementById('areaFilter').addEventListener('change', e => {
+      areaVal = e.target.value;
+      renderList();
+    });
+
+    document.getElementById('statusFilter').addEventListener('change', e => {
+      statusVal = e.target.value;
+      renderList();
+    });
+
+    document.getElementById('priorityFilter').addEventListener('change', e => {
+      priorityVal = e.target.value;
+      renderList();
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', e => {
+      sortBy = e.target.value === 'due' ? 'due' : 'id';
+      renderList();
+    });
+
+    document.getElementById('viewToggle').addEventListener('click', e => {
+      const btn = e.target.closest('.toggle-btn');
+      if (!btn) return;
+      switchView(btn.dataset.val);
+    });
+
+    document.getElementById('stateToggle').addEventListener('click', e => {
+      const btn = e.target.closest('.toggle-btn');
+      if (!btn) return;
+      setToggle('stateToggle', btn.dataset.val);
+      stateFilter = btn.dataset.val;
+      renderList();
+    });
+
+    document.getElementById('groupToggle').addEventListener('click', e => {
+      const btn = e.target.closest('.toggle-btn');
+      if (!btn) return;
+      setToggle('groupToggle', btn.dataset.val);
+      groupBy = btn.dataset.val;
+      renderList();
+    });
+  }
+
+  /* ============================================================
+     Init
+  ============================================================ */
+
+  renderStats();
+  populateAreaFilter();
+  wireToolbar();
+  renderList();
+  renderDetail();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>claude-starter 概要</title>
+<!--
+  docs/プロジェクト概要.html — 目的・思想・現在地・将来対応・構成図の正本。
+  編集は update-overview スキルで、各 BEGIN/END マーカーの内側だけを触る。
+  task-snapshot・open-issues・milestones・recent-decisions は docs/案件/01_タスク管理/build.py が自動生成する（手で編集しない）。
+  phase の data-phase（Sketch / Build）は機械が読む。切り替えは python3 .claude/hooks/phase.py --set <フェーズ>（AI が判断。update-overview スキル）。
+  単一ファイル・外部 script/link 禁止・秘密（URL・ID・パスワード）は書かない（環境情報.md 参照と書く）。
+  検査: python3 scripts/check_skeleton.py --overview
+-->
+<style>
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #eef1f5;
+  --ink: #1d2735;
+  --muted: #5b6779;
+  --line: #dde2ea;
+  --accent: #2b5da8;
+  --ok: #2e7d68;
+  --warn: #a8681f;
+  --danger: #9c3d3d;
+  --serif: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", "Times New Roman", serif;
+  --sans: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", "Segoe UI", system-ui, sans-serif;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161e; --surface: #1a212d; --surface-2: #212a39;
+    --ink: #e7ecf4; --muted: #9aa6b8; --line: #303b4e;
+    --accent: #7ea6e6; --ok: #5cb9a0; --warn: #d9a25e; --danger: #d98c8c;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161e; --surface: #1a212d; --surface-2: #212a39;
+  --ink: #e7ecf4; --muted: #9aa6b8; --line: #303b4e;
+  --accent: #7ea6e6; --ok: #5cb9a0; --warn: #d9a25e; --danger: #d98c8c;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--sans);
+  font-size: 15px; line-height: 1.85; margin: 0; -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 28px 96px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { font-family: var(--mono); font-size: .9em; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+pre {
+  font-family: var(--mono); font-size: 12.5px; line-height: 1.6; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; overflow-x: auto; margin: 16px 0;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+
+/* ---------- hero ---------- */
+header.hero { padding: 64px 0 32px; border-bottom: 1px solid var(--line); }
+.hero .kicker { font-size: 12px; letter-spacing: .18em; color: var(--accent); font-weight: 700; margin-bottom: 14px; }
+.hero h1 {
+  font-family: var(--serif); font-weight: 700; font-size: clamp(28px, 5vw, 42px);
+  line-height: 1.35; margin: 0 0 14px; text-wrap: balance;
+}
+.hero .lede { max-width: 42em; color: var(--muted); margin: 0 0 18px; }
+.hero .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 12.5px; color: var(--muted); }
+.hero .meta b { color: var(--ink); font-weight: 600; }
+
+/* ---------- nav ---------- */
+nav.toc {
+  position: sticky; top: 0; z-index: 5; background: var(--bg);
+  border-bottom: 1px solid var(--line); margin: 0 -28px; padding: 10px 28px;
+}
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 12.5px; }
+nav.toc a { color: var(--muted); font-weight: 600; }
+nav.toc a:hover { color: var(--accent); text-decoration: none; }
+nav.toc .n { color: var(--accent); margin-right: 5px; font-variant-numeric: tabular-nums; }
+
+/* ---------- sections ---------- */
+section { padding: 52px 0 8px; scroll-margin-top: 56px; }
+.eyebrow { display: flex; align-items: baseline; gap: 14px; font-size: 12px; letter-spacing: .16em; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+.eyebrow .no { color: var(--accent); font-size: 13px; }
+h2 { font-family: var(--serif); font-weight: 700; font-size: clamp(21px, 3.2vw, 28px); line-height: 1.45; margin: 0 0 14px; text-wrap: balance; }
+h3 { font-size: 16px; font-weight: 700; margin: 30px 0 10px; }
+p { margin: 0 0 14px; max-width: 46em; }
+p.note, .muted { font-size: 13px; color: var(--muted); }
+ul, ol { margin: 0 0 14px; padding-left: 1.4em; max-width: 46em; }
+li { margin-bottom: 4px; }
+strong { color: var(--ink); }
+
+/* ---------- phase card ---------- */
+.phase {
+  display: grid; grid-template-columns: auto 1fr; gap: 16px 22px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+  border-radius: 10px; padding: 18px 22px; margin: 18px 0 26px;
+}
+.phase .name { font-family: var(--serif); font-size: 22px; font-weight: 700; white-space: nowrap; }
+.phase .word { color: var(--muted); font-size: 14px; }
+.phase .word strong { color: var(--ink); }
+@media (max-width: 600px) { .phase { grid-template-columns: 1fr; } }
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; margin: 14px 0 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: var(--surface-2); font-weight: 700; font-size: 12.5px; color: var(--muted); letter-spacing: .04em; }
+tr:last-child td { border-bottom: none; }
+td.id, th.id { white-space: nowrap; font-family: var(--mono); font-size: 12px; }
+
+/* ---------- decisions ---------- */
+ul.decisions { list-style: none; padding: 0; margin: 12px 0 8px; max-width: none; }
+ul.decisions li { display: grid; grid-template-columns: 96px 1fr auto; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+ul.decisions li:last-child { border-bottom: none; }
+ul.decisions .d { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
+ul.decisions .ref { font-family: var(--mono); font-size: 12px; color: var(--accent); white-space: nowrap; }
+@media (max-width: 600px) { ul.decisions li { grid-template-columns: 1fr; gap: 2px; } }
+
+/* ---------- chips ---------- */
+.chip { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 1px 9px 2px; border-radius: 4px; white-space: nowrap; border: 1px solid transparent; line-height: 1.7; }
+.chip.todo { color: var(--muted); border-color: var(--line); }
+.chip.doing { color: var(--accent); border-color: var(--accent); }
+.chip.done { color: var(--ok); border-color: var(--ok); }
+.chip.hold { color: var(--warn); border-color: var(--warn); }
+
+/* ---------- snapshot (build.py が中身を書く) ---------- */
+.snapshot { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; margin: 14px 0 8px; }
+.snapshot p { margin: 0; }
+
+/* ---------- callout ---------- */
+.callout { border-left: 3px solid var(--accent); background: var(--surface-2); border-radius: 0 10px 10px 0; padding: 12px 18px; margin: 18px 0; max-width: 46em; font-size: 14px; }
+.callout p { margin: 0; }
+
+/* ---------- footer ---------- */
+footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+
+/* ---------- print ---------- */
+@media print {
+  :root { --bg: #fff; --surface: #fff; --surface-2: #f3f4f6; --ink: #111; --muted: #444; --line: #ccc; --accent: #1f4e8c; }
+  body { font-size: 11.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  nav.toc { position: static; }
+  section { page-break-inside: avoid; padding-top: 28px; }
+  a[href^="#"]::after { content: ""; }
+  pre, table, .phase, .snapshot { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker">PROJECT OVERVIEW</div>
+  <h1>claude-starter</h1>
+  <p class="lede">Claude Code の初期セット。~/.claude に入れる汎用の決めごと・skill・rules・hooks と、プロジェクトから育てて自動展開する仕組み</p>
+  <div class="meta">
+    <span>最終更新 <b><!-- BEGIN:updated -->2026-10-01<!-- END:updated --></b></span>
+    <span>管理 <b>（未定）</b></span>
+    <span>更新手順 <code>update-overview</code> スキル</span>
+  </div>
+</header>
+
+<nav class="toc" aria-label="目次">
+  <ol>
+    <li><a href="#purpose"><span class="n">1</span>目的・背景</a></li>
+    <li><a href="#principles"><span class="n">2</span>思想・設計原則</a></li>
+    <li><a href="#phase"><span class="n">3</span>現在地</a></li>
+    <li><a href="#roadmap"><span class="n">4</span>将来対応</a></li>
+    <li><a href="#map"><span class="n">5</span>構成図・環境・設計書の入口</a></li>
+    <li><a href="#history"><span class="n">6</span>更新履歴</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<section id="purpose">
+  <div class="eyebrow"><span class="no">01</span>PURPOSE</div>
+  <h2>目的・背景</h2>
+  <!-- BEGIN:purpose -->
+  <p>claude-starter は、Claude Code の初期セット。~/.claude に入れる汎用の決めごと・skill・rules・hooks と、プロジェクトから育てて自動展開する仕組み</p>
+  <p>（誰の、どんな困りごとを、どう解くか。なぜ今やるのか。詳細は <code>docs/設計書/01-概要.md</code>）</p>
+  <!-- END:purpose -->
+</section>
+
+<!-- ============================================================ -->
+<section id="principles">
+  <div class="eyebrow"><span class="no">02</span>PRINCIPLES</div>
+  <h2>思想・設計原則</h2>
+  <!-- BEGIN:principles -->
+  <ul>
+    <li><strong>原則 1（見出し）</strong> — 一文で。なぜそうするかを添える</li>
+    <li><strong>原則 2（見出し）</strong> — 一文で</li>
+    <li><strong>原則 3（見出し）</strong> — 一文で</li>
+  </ul>
+  <p class="note">原則は「迷ったときにどちらを選ぶか」を決めるためのもの。3〜7 個に絞る。判断の経緯は <code>docs/設計書/decisions/</code> の ADR に残す。</p>
+  <!-- END:principles -->
+</section>
+
+<!-- ============================================================ -->
+<section id="phase">
+  <div class="eyebrow"><span class="no">03</span>WHERE WE ARE</div>
+  <h2>現在地</h2>
+  <!-- BEGIN:phase -->
+  <div class="phase" data-phase="Sketch">
+    <div class="name">Sketch</div>
+    <div class="word">プロジェクトを 2026-10-01 に生成した。<strong>次の一手:</strong> 打合せ・会話で出たことを記録し、決まっていないことを課題にする。目的とスコープを 1 行ずつ書く。</div>
+  </div>
+  <!-- END:phase -->
+
+  <h3>決めてほしいこと</h3>
+  <!-- BEGIN:open-issues -->
+<p class="muted">いま決めてほしいことはありません。</p>
+  <!-- END:open-issues -->
+
+  <h3>次の節目</h3>
+  <!-- BEGIN:milestones -->
+<p class="muted">節目はまだありません（ロードマップの時期に日付を書くか、タスクに due を付けると出ます）。</p>
+  <!-- END:milestones -->
+
+  <h3>直近の決定</h3>
+  <!-- BEGIN:recent-decisions -->
+<p class="muted">まだ決定はありません。</p>
+  <!-- END:recent-decisions -->
+  <p class="note">上の 3 つは <code>build.py</code> が書き換える（手で編集しない）。未決は課題 md、決定は打合せ記録の「決定」か閉じた課題の「決定」が正本。</p>
+
+  <h3>タスクの状況</h3>
+  <div class="snapshot">
+    <!-- BEGIN:task-snapshot -->
+<p>生成: 2026-10-01 19:40 ／ OPEN 0 件（課題 0・確認待ち 0・進行中 0・期限切れ 0）／ CLOSED 0 件</p>
+<p>画面: 完了 0 / 0</p>
+<p>OPEN のタスクはありません（課題は「決めてほしいこと」に出る）。</p>
+    <!-- END:task-snapshot -->
+  </div>
+  <p class="note">この枠も <code>build.py</code> が書き換える（課題は「決めてほしいこと」に出るので除く）。一覧は <code>docs/案件/01_タスク管理/index.html</code>。</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="roadmap">
+  <div class="eyebrow"><span class="no">04</span>ROADMAP</div>
+  <h2>将来対応</h2>
+  <!-- BEGIN:roadmap -->
+  <table>
+    <thead><tr><th style="width:9em">時期</th><th>内容</th><th style="width:7em">状態</th><th class="id" style="width:8em">関連 ID</th></tr></thead>
+    <tbody>
+      <tr><td>（例）第 1 段階</td><td>最初の動くものを作る</td><td><span class="chip todo">未着手</span></td><td class="id">—</td></tr>
+      <tr><td>（例）第 2 段階</td><td>利用者に触ってもらい、確認依頼一覧で回収する</td><td><span class="chip todo">未着手</span></td><td class="id">—</td></tr>
+    </tbody>
+  </table>
+  <p class="note">状態は 未着手 / 進行中 / 完了 / 保留。完了した行は「6. 更新履歴」へ移して落とす。時期に日付（YYYY-MM-DD か YYYY-MM）を書いた行は「次の節目」に出る。チームに見せてよい日付だけを書く。</p>
+  <!-- END:roadmap -->
+</section>
+
+<!-- ============================================================ -->
+<section id="map">
+  <div class="eyebrow"><span class="no">05</span>MAP</div>
+  <h2>構成図・環境・設計書の入口</h2>
+  <!-- BEGIN:map -->
+<pre><code>  利用者 ──▶ [ フロント ] ──▶ [ API ] ──▶ [ DB ]
+                                   └──▶ [ 外部サービス ]
+
+  （テキスト図。詳細は docs/設計書/02-構成.md）</code></pre>
+  <table>
+    <thead><tr><th style="width:12em">名前</th><th>用途</th><th style="width:14em">正本の所在</th></tr></thead>
+    <tbody>
+      <tr><td>（例）本番</td><td>利用者が使う環境</td><td>環境情報.md §2.1</td></tr>
+      <tr><td>（例）ローカル</td><td>開発・動作確認</td><td>環境情報.md §2.2</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><p>URL・ID・パスワード・鍵はこのページに書かない。実値は <code>環境情報.md</code>（ルート直下・Git 管理外）にあり、ここには「名前・用途・正本の所在」だけを置く。</p></div>
+  <!-- END:map -->
+
+  <h3>設計書の入口</h3>
+  <table>
+    <thead><tr><th class="id" style="width:4em">#</th><th>何の正本か</th><th>いつ読むか</th></tr></thead>
+    <tbody>
+      <tr><td class="id">01</td><td>何を作るか — 目的・利用者ロール・スコープ・用語</td><td>最初に。機能を足す・削るとき</td></tr>
+      <tr><td class="id">02</td><td>どう作るか — 構成・技術スタック・データの流れと信頼境界・環境</td><td>コンポーネントを足す、境界をまたぐ処理を書くとき</td></tr>
+      <tr><td class="id">03</td><td>誰と決めるか — 関係者ロール・判断権限・確認の取り方・NG 事項</td><td>誰かに確認する前、文面を送る前</td></tr>
+      <tr><td class="id">04</td><td>なぜそうするか — 原則・緊張関係・方針の変遷</td><td>判断に迷ったとき</td></tr>
+      <tr><td class="id">05</td><td>何を守るか — 脅威・境界・認証権限・データ格付け・鍵</td><td>認証・権限・ログ・外部連携・秘密を触るとき</td></tr>
+      <tr><td class="id">06</td><td>何を壊れたとみなすか — 重大度・機械のゲート・レビュー観点・不変条件・テスト</td><td>レビューする前、hook・CI・テストを触るとき</td></tr>
+      <tr><td class="id">07</td><td>どう回すか（開発側）— 環境・ブランチ・DB・デプロイ・戻し・監視</td><td>マイグレーション・デプロイ・戻しの前</td></tr>
+      <tr><td class="id">08</td><td>どう回すか（利用者側）— 業務フロー・権限付与・サポート・障害時の文面</td><td>利用者に見せる文面・権限付与の前</td></tr>
+      <tr><td class="id">09</td><td>どこまで耐えるか — 目標・容量・バックアップ・縮退・監視条件・費用</td><td>性能・容量・障害・費用の話をするとき</td></tr>
+    </tbody>
+  </table>
+  <p class="note">正本は <code>docs/設計書/README.md</code>。ここは要約。文書を増減したときだけ手で直す。</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="history">
+  <div class="eyebrow"><span class="no">06</span>HISTORY</div>
+  <h2>更新履歴</h2>
+  <!-- BEGIN:history -->
+  <table>
+    <thead><tr><th style="width:9em">日付</th><th style="width:12em">更新箇所</th><th>要点</th></tr></thead>
+    <tbody>
+      <tr><td>2026-10-01</td><td>全体</td><td>project-skeleton v1.5.0 から初版を生成</td></tr>
+    </tbody>
+  </table>
+  <p class="note">新しい順。更新のたびに先頭へ 1 行足し、冒頭の「最終更新」を同じ日付にする。</p>
+  <!-- END:history -->
+</section>
+
+<footer>
+  claude-starter ／ このページは <code>docs/プロジェクト概要.html</code> の単一ファイル。印刷・共有しても崩れないよう外部リソースを使っていない。
+</footer>
+
+</div>
+</body>
+</html>

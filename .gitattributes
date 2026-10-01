@@ -1,0 +1,25 @@
+# 改行は LF に統一（Windows / WSL / macOS を跨いでも差分が出ないようにする）
+* text=auto eol=lf
+
+# テキスト
+*.py    text
+*.sh    text
+*.md    text
+*.html  text
+*.json  text
+*.js    text
+*.css   text
+*.yml   text
+*.yaml  text
+*.txt   text
+
+# バイナリ
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.pdf   binary
+*.pptx  binary
+*.xlsx  binary
+*.docx  binary
+*.zip   binary

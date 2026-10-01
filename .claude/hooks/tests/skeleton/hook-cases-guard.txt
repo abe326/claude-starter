@@ -1,0 +1,63 @@
+# work_area_guard.py の判定ケース。
+# 書式: <期待 allow|block><TAB><file_path>[<TAB><CLAUDE_PROJECT_DIR の上書き>]
+# 3 列目を省略した行は run-all.sh が template ルートを CLAUDE_PROJECT_DIR にして流す（相対パスで判定）。
+# 3 列目がある行はそのルートで判定する（Windows 形式のルートと file_path の組み合わせを見る）。
+# 行頭 # と空行は無視。
+
+# --- ルート直下 ---
+block	x.png
+block	debug.log
+block	dump.sql
+block	memo.md
+block	notes.json
+allow	CLAUDE.md
+allow	README.md
+allow	CHANGELOG.md
+allow	.gitignore
+allow	.env
+allow	.env.local
+allow	.env.example
+allow	環境情報.md
+allow	案件情報.md
+allow	Makefile
+allow	pyproject.toml
+allow	package.json
+allow	docker-compose.yml
+allow	docker-compose.dev.yml
+
+# --- .work/ ---
+block	.work/foo.md
+block	.work/image.png
+allow	.work/README.md
+block	.work/一時/x.md
+block	.work/一時/temp/x.md
+block	.work/一時/debug/a.log
+block	.work/一時/比較表/x.md
+allow	.work/一時/20260923_確認/x.md
+allow	.work/一時/20260923_比較表/sub/deep.html
+allow	.work/証跡/QA-01_検証/a.png
+allow	.work/機密/DD-01_受領資料/契約書.pdf
+allow	.work/_bk/20260923_旧版/old.md
+
+# --- ディレクトリ配下は通す ---
+allow	docs/案件/x.md
+allow	docs/案件/01_タスク管理/open/UI-01_ログイン.md
+allow	docs/プロジェクト概要.html
+allow	src/a.py
+allow	scripts/check_skeleton.py
+allow	.claude/skills/task/SKILL.md
+
+# --- ルート外は通す ---
+allow	/tmp/other/x.png
+allow	../sibling/x.png
+
+# --- 絶対パス（Windows 形式のルート・file_path）---
+block	C:\work\proj\x.png	C:\work\proj
+allow	C:\work\proj\CLAUDE.md	C:\work\proj
+allow	C:\work\proj\docs\a.md	C:\work\proj
+block	C:/work/proj/.work/一時/x.md	C:\work\proj
+allow	C:/work/proj/.work/一時/20260923_確認/x.md	C:\work\proj
+block	/c/work/proj/foo.png	C:\work\proj
+allow	/c/work/proj/src/a.py	C:\work\proj
+block	C:\work\proj\.work\foo.md	C:/work/proj
+allow	C:\work\other\x.png	C:\work\proj

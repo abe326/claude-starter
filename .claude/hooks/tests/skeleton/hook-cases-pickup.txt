@@ -1,0 +1,83 @@
+# pickup_cue.py（UserPromptSubmit）・pickup_check.py（Stop）・design_docs_reminder.py（PostToolUse の記録）の手順つきケース。
+# run_pickup_cases.py が読む。ケースごとに一時ディレクトリへ模擬プロジェクトを作り、手順を順に流す。
+#
+# 書式: <期待 none|context|block><TAB><手順><TAB><出力に含む文字列 or -><TAB><フェーズ or -><TAB><備考>
+#   期待は「最後の手順」の出力に対して見る（none = 出力なし / context = additionalContext / block = "decision":"block"）
+#   フェーズ: - は Sketch（data-phase="Sketch"）。Sketch / Build は概要 HTML の data-phase に書く（旧い値もそのまま書けば読み替わる）。なし は phase マーカーの無い概要 HTML
+# 手順は ; 区切り:
+#   prompt:<文>        UserPromptSubmit を流す（\n は改行）
+#   prompt-long:<字数>  字数ぶんの貼り付け文（「あとで」を含む）を流す
+#   prompt-raw:<文>     session_id 付きの JSON に、<文> をそのまま prompt として入れる（< で始まる通知など）
+#   touch:<rel>        ファイルを書いて PostToolUse（Write）を流す
+#   bash:<rel>         ファイルを書くだけ（PostToolUse を通さない = new.py・close.py 相当）
+#   stop / stop-active Stop を流す（stop_hook_active: false / true）
+#   stopraw:<文>        Stop に <文> をそのまま流す（壊れた JSON）
+#   nosid              以後の手順を session_id なしで流す
+#   env:<名前>=<値>     以後の手順に環境変数を足す
+# <rel> の略記: 02_打合せ/ → docs/案件/02_打合せ/、open/ → docs/案件/01_タスク管理/open/。ほかはルート相対。
+# 模擬プロジェクトの打合せ記録: ok.md（全行に落ち先）/ nodrop.md（決定 1 行に落ち先なし）/ guess.md（→ APP-1）/
+#   missing.md（→ APP-09）/ notissue.md（→ 未決 APP-01）/ old.md（## 決定事項・落ち先なし）/ oldcol.md（宿題の旧列「関連タスク ID」）
+# 行頭 # と空行は無視。
+
+# --- Stop: 打合せ記録（S1）---
+none	stop	-	-	何も起きていないターン
+none	touch:02_打合せ/ok.md;stop	-	-	全行に落ち先あり
+block	touch:02_打合せ/nodrop.md;stop	落ち先なし 1	-	S1
+none	touch:02_打合せ/nodrop.md;stop;touch:02_打合せ/nodrop.md;stop	-	-	同じ行は二度と促さない
+block	touch:02_打合せ/guess.md;stop	書式違反	-	予想 ID（APP-1）
+block	touch:02_打合せ/missing.md;stop	ID 不在	-	APP-09
+block	touch:02_打合せ/notissue.md;stop	課題でない	-	未決の落ち先がタスク
+none	touch:02_打合せ/nodrop.md;stop-active	-	-	ループ防止
+block	touch:02_打合せ/old.md;stop	落ち先なし	-	旧見出し ## 決定事項 も読む
+none	touch:02_打合せ/oldcol.md;stop	-	-	宿題の旧列「関連タスク ID」の実在 ID を落ち先と読む
+none	bash:02_打合せ/ok.md;stop	-	-	mtime 経路（問題なし）
+block	prompt:打合せを記録して;bash:02_打合せ/nodrop.md;stop	落ち先なし 1	-	mtime 経路でも S1
+block	touch:02_打合せ/nodrop.md;stop;touch:02_打合せ/guess.md;stop	書式違反	-	別の問題は別に促す
+block	touch:02_打合せ/nodrop.md;stop	決定「対象は本社のみ」	-	reason に行の本文
+
+# --- Stop: 依頼文の拾いもの（S2）と UserPromptSubmit の文脈 ---
+context	prompt:ログの整理はあとでやろう	あとで	-	UserPromptSubmit の文脈
+block	prompt:ログの整理はあとでやろう;stop	あとで	-	S2
+none	prompt:ログの整理はあとでやろう;bash:open/APP-05_ログ整理.md;stop	-	-	new.py で起票済み（Bash 経由でも誤発火しない）
+none	prompt:心配しないで大丈夫です、続けて;stop	-	-	除外語
+none	prompt:心配しないで大丈夫です、続けて	-	-	除外語（文脈も出さない）
+none	prompt:どちらでもいずれかを選んで進めて	-	-	「いずれか」は当てない
+none	prompt:以後の手順と後の作業を説明して	-	-	「以後」「後の」は当てない
+context	prompt:SSO の方式はまだ未定です	未決	-	未決の手がかり
+context	prompt:認証は JWT で行こう、それで決定	決定	-	決定の手がかり
+context	prompt:今後 rm -rf は使わないで	ハーネス候補	-	UserPromptSubmit の文脈
+block	prompt:今後 rm -rf は使わないで;stop	ハーネス候補	-	S2（ハーネス）
+none	prompt:今後 rm -rf は使わないで;bash:docs/ハーネス台帳.md;stop	-	-	台帳に書いたので落ちた扱い
+none	prompt:/task 起票して あとで;stop	-	-	スラッシュコマンドは見ない
+none	prompt:あとで	-	-	10 字未満は見ない
+none	prompt:次のコードを見て\n```\n# TODO: あとで直す\n```\nどう思う?;stop	-	-	コードブロック内は見ない
+none	prompt:引用を読んで\n> あとでやると言っていた\nこれの意味は?;stop	-	-	引用は見ない
+context	prompt-long:1600	長文の貼り付け	-	paste
+none	prompt-long:1600;stop	-	-	paste は S2 に数えない
+none	prompt-raw:<task-notification>あとでやる</task-notification>;stop	-	-	システム由来の依頼は見ない
+none	prompt:ログの整理はあとでやろう;stop-active	-	-	続行中は促さない
+none	prompt:ログの整理はあとでやろう;stop;prompt-raw:<task-notification>完了</task-notification>;stop	-	-	通知のターンで二重に促さない
+block	prompt:ログの整理はあとでやろう;stop;prompt:ログの整理はあとでやろう、まだ？;stop	あとで	-	別の依頼の同じ語は別件
+
+# --- Stop: 実装の区切り（S3）---
+block	touch:src/auth/login.py;stop	05-セキュリティ設計.md	Build	S3
+block	prompt:ログインを実装して;bash:docs/設計書/01-overview.md;touch:src/auth/login.py;stop	05-セキュリティ設計.md	Build	候補以外の設計書を触っても S3
+block	touch:src/auth/login.py;stop	決まったことを 1 行	運用	旧い値「運用」も Build に読み替えて S3
+none	touch:src/auth/login.py;touch:docs/設計書/05-セキュリティ設計.md;stop	-	Build	候補を触った
+none	prompt:ログインを実装して;touch:src/auth/login.py;bash:docs/設計書/05-セキュリティ設計.md;stop	-	Build	候補を Bash で直した（mtime）
+none	touch:src/auth/login.py;stop	-	Sketch	Sketch の間は S3 なし
+none	touch:src/auth/login.py;stop;touch:src/auth/login.py;stop	-	Build	同じ候補集合は 1 回
+none	touch:src/auth/login.py;stop	-	なし	フェーズ不明は Sketch 扱い
+none	touch:src/util/strings.py;stop	-	Build	影響マップに当たらない
+none	touch:.work/一時/20260923_x/a.py;stop	-	Build	.work/ はソースに数えない
+block	prompt:あとでやろうね、この件は;touch:02_打合せ/nodrop.md;touch:src/auth/login.py;stop	落ち先なし	Build	3 信号 → 1 回の block
+block	prompt:あとでやろうね、この件は;touch:02_打合せ/nodrop.md;touch:src/auth/login.py;stop	05-セキュリティ設計.md	Build	同上（S3 の行も同じ reason に入る）
+
+# --- 安全弁 ---
+none	nosid;touch:02_打合せ/nodrop.md;stop	-	-	session_id なしは黙る
+none	env:CLAUDE_PICKUP=off;touch:02_打合せ/nodrop.md;stop	-	-	CLAUDE_PICKUP=off
+none	env:CLAUDE_PICKUP=off;prompt:ログの整理はあとでやろう	-	-	CLAUDE_PICKUP=off は文脈も出さない
+block	prompt:作業1はあとでやることにする;stop;prompt:作業2はあとでやることにする;stop;prompt:作業3はあとでやることにする;stop;prompt:作業4はあとでやることにする;stop;prompt:作業5はあとでやることにする;stop;prompt:作業6はあとでやることにする;stop	あとで	-	6 回目までは促す
+none	prompt:作業1はあとでやることにする;stop;prompt:作業2はあとでやることにする;stop;prompt:作業3はあとでやることにする;stop;prompt:作業4はあとでやることにする;stop;prompt:作業5はあとでやることにする;stop;prompt:作業6はあとでやることにする;stop;prompt:作業7はあとでやることにする;stop	-	-	上限 6 回（7 回目は黙る）
+none	stopraw:{"session_id": "s1", broken	-	-	壊れた JSON は exit 0
+none	stopraw:[1,2,3]	-	-	オブジェクトでない JSON
