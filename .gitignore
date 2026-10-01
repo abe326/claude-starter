@@ -24,3 +24,6 @@ scratchpad/
 /*.log
 /*.sql
 /*.json
+
+# --- skill の依存（starter.py install が入れる）---
+node_modules/

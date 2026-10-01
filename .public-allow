@@ -1,0 +1,7 @@
+# 形式検査（トークン・メール・IP・絶対パス）だけ外すファイル。個人語の検査は外さない。<パス><TAB><理由>
+scripts/tests/secret-cases.txt	スケルトン由来。秘密検出のテスト用の架空の値
+.claude/hooks/drops.py	スケルトン由来。秘密の形式を検出する正規表現
+.claude/rules/secrets.md	スケルトン由来。秘密の例示
+scripts/check_skeleton.py	スケルトン由来。秘密の形式を検出する正規表現
+scripts/check_public.py	検査そのもの。形式の正規表現
+scripts/tests/test_starter.py	検査のテスト。架空のメール・パス・トークン

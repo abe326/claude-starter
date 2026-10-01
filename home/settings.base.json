@@ -1,0 +1,64 @@
+{
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
+  },
+  "language": "日本語",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(jq *)",
+      "Bash(diff *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(stat *)",
+      "Bash(file *)",
+      "Bash(tree *)",
+      "Bash(which *)",
+      "Bash(pwd)",
+      "Bash(@PY@ ~/.claude/starter/scripts/starter.py candidates *)",
+      "Bash(@PY@ ~/.claude/starter/scripts/check_public.py *)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "@PY@ ~/.claude/starter/home/statusline/statusline.py"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "@PY@ ~/.claude/starter/scripts/starter.py sync --hook",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "@PY@ ~/.claude/starter/scripts/starter.py cue",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

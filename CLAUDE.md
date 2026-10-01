@@ -31,6 +31,9 @@ Claude Code の初期セット。~/.claude に入れる汎用の決めごと・s
 8. **ハーネス（skill・hook・rule・permissions・agents）はユーザーの承認なしに定義しない。** 同じ手順を 2 回した・「しないで」と言われた・同じ指摘を 2 回受けたら、`harness` スキルで `docs/ハーネス台帳.md` に候補として書く。`.claude/agents/*.md` の定義には `model` を必ず書く
 
 <!-- プロジェクト固有の制約をここに追記する（番号は 9 から続ける） -->
+9. **このリポは public。個人の事情（実名・メールアドレス・社名・案件名・マシン名・IP・ホームの絶対パス・Slack チャンネル）を書かない。** commit の前に `python3 scripts/check_public.py --history` を通す。個人の事情は各マシンの `~/.claude/CLAUDE.personal.md`・`settings.personal.json` へ
+10. **`home/` と `scripts/starter.py` は全マシンの `~/.claude` から使われている配布物。** 直した瞬間に、このマシンの全セッションに効く。壊すと全プロジェクトの起動が乱れるので、`scripts/` を変えたら `python3 scripts/tests/run_tests.py` を通してから作業を終える
+11. **Anthropic 製の skill（docx・pdf・pptx・xlsx など）は収録しない。** 再配布できない
 
 ## 4. リポジトリ構造
 
@@ -45,7 +48,11 @@ claude-starter/
 │   ├── ハーネス台帳.md           ← ハーネスの候補・定義済（harness スキル）
 │   ├── 案件/作業ログ/           ← 出来事の時系列（生成物。最新.md から読む）
 │   └── 設計書/                  ← 設計の正本。最初は 01 だけ、template/ から足す（decisions/ に ADR、runbook/ に手順）。構成図の正本は .claude/rules/docs-management.md
-├── .work/                       ← Git 管理外の作業領域（証跡/ 機密/ 一時/ _bk/）
+├── home/                        ← 配布物（~/.claude にリンクされる）: CLAUDE.md / rules/ / skills/ / statusline/ / settings.base.json
+├── personal.example/            ← 個人部の雛形
+├── scripts/starter.py           ← install / sync（SessionStart）/ cue（Stop）/ candidates
+├── scripts/check_public.py      ← 公開前検査（.public-allow で形式検査の例外）
+├── .work/                       ← Git 管理外の作業領域（証跡/ 機密/ 一時/ _bk/ promote/）
 └── .claude/                     ← rules/ skills/ hooks/ settings.json(編集は承認が要る領域)
 ```
 
@@ -53,13 +60,19 @@ claude-starter/
 
 | レイヤー | 技術 | 備考 |
 |---|---|---|
-| | | |
+| 展開・同期・検査 | Python 3（標準ライブラリのみ） | `scripts/starter.py`・`scripts/check_public.py`。Windows はジャンクション（`_winapi.CreateJunction`） |
+| 配布物 | Markdown・JSON | `home/`。CLAUDE.md の `@` 読み込み・`~/.claude/rules/`・`~/.claude/skills/` |
+| skill の依存 | Node.js（pptx-template だけ） | `npm install` は install／sync が行う。`node_modules/` は Git 管理外 |
+| CI | GitHub Actions | 形式検査（`--history`）・単体テスト・gitleaks |
 
 ## 6. 用語集
 
 | 用語 | 意味 |
 |---|---|
-| | |
+| 汎用部 | `home/` の配布物。公開してよい、どのマシン・プロジェクトでも効く決めごと |
+| 個人部 | 各マシンの `~/.claude/CLAUDE.personal.md`・`settings.personal.json`・`public-denylist.txt`。リポに入れない |
+| 候補 | プロジェクトで変わった skill・rules・agents・CLAUDE.md の記録（作業領域 .work の promote フォルダにある candidates.jsonl）。`promote` スキルで振り分ける |
+| 公開前検査 | `scripts/check_public.py`。形式（トークン・メール・IP・絶対パス）と個人語リスト |
 
 ## 7. 作業前に読むもの
 

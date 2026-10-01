@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(npm *)"
+    ],
+    "defaultMode": "acceptEdits"
+  },
+  "effortLevel": "high",
+  "theme": "dark",
+  "enabledPlugins": {
+    "skill-creator@claude-plugins-official": true
+  }
+}
