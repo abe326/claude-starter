@@ -5,11 +5,11 @@ useDefault = true
 [allowlist]
 description = "テスト用の架空の値・検出用の正規表現"
 paths = [
-  scripts/tests/secret-cases.txt,
-  scripts/tests/test_secrets.py,
-  scripts/tests/test_starter.py,
-  scripts/check_public.py,
-  scripts/check_skeleton.py,
-  .claude/hooks/drops.py,
-  .claude/rules/secrets.md,
+  '''scripts/tests/secret-cases\.txt''',
+  '''scripts/tests/test_secrets\.py''',
+  '''scripts/tests/test_starter\.py''',
+  '''scripts/check_public\.py''',
+  '''scripts/check_skeleton\.py''',
+  '''\.claude/hooks/drops\.py''',
+  '''\.claude/rules/secrets\.md''',
 ]
