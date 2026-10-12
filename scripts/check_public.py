@@ -6,7 +6,10 @@
   python3 scripts/check_public.py <フォルダ>   任意のプロジェクト（Git リポジトリ）に向ける。既定はこのリポ
   python3 scripts/check_public.py <フォルダ> --exclude 'docs/案件/*'   過去の記録など、検査から外すパス（glob。繰り返せる）
   python3 scripts/check_public.py --history    加えて git の全履歴（コミットメッセージと差分）
-  python3 scripts/check_public.py --denylist F 個人語リストを指定（既定 ~/.claude/public-denylist.txt。無ければ形式検査だけ）
+  python3 scripts/check_public.py --denylist F 個人語リストを指定
+    既定: 対象を省くとき（このリポの公開前検査）は ~/.claude/public-denylist.txt、
+          対象フォルダを指すとき（自分のプロジェクトの検査）は ~/.claude/env-denylist.txt（機名・内部のホスト名だけの語リスト）
+          どちらも無ければ形式検査だけ
 
 見るもの:
   - 形式: トークン・秘密鍵・Slack Webhook・メールアドレス・プライベート IP・ホームの絶対パス
@@ -31,6 +34,7 @@ import zipfile
 sys.dont_write_bytecode = True
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_DENY = os.path.join(os.path.expanduser("~"), ".claude", "public-denylist.txt")
+ENV_DENY = os.path.join(os.path.expanduser("~"), ".claude", "env-denylist.txt")
 OFFICE = (".pptx", ".potx", ".docx", ".dotx", ".xlsx", ".xltx")
 BINARY = (".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".pdf", ".zip")
 
@@ -152,7 +156,7 @@ def main(argv: list[str]) -> int:
             pass
     ap = argparse.ArgumentParser(description="公開前の検査")
     ap.add_argument("--history", action="store_true", help="git の全履歴も見る")
-    ap.add_argument("--denylist", default=DEFAULT_DENY)
+    ap.add_argument("--denylist", default=None, help="個人語リスト。既定は対象を省くとき public-denylist.txt、対象を指すとき env-denylist.txt")
     ap.add_argument("target", nargs="?", default=REPO, help="検査するプロジェクトのフォルダ（Git リポジトリ。既定はこのリポ）")
     ap.add_argument("--exclude", action="append", default=[], metavar="GLOB", help="検査から外すパス（繰り返せる）")
     args = ap.parse_args(argv)
@@ -161,6 +165,8 @@ def main(argv: list[str]) -> int:
     if git("rev-parse", "--is-inside-work-tree", root=root).strip() != "true":
         print(f"error: Git リポジトリではない: {args.target}", file=sys.stderr)
         return 2
+    if args.denylist is None:
+        args.denylist = DEFAULT_DENY if args.target == REPO else ENV_DENY
     deny = load_denylist(args.denylist)
     allow = load_allow(root)
     exclude = load_lines(root, ".public-exclude") + args.exclude

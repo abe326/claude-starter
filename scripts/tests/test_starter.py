@@ -274,6 +274,22 @@ class TestCheckPublic(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             self.assertEqual(self.run_on(tmp).returncode, 2)
 
+    def test_default_denylist_depends_on_target(self):
+        with tempfile.TemporaryDirectory() as home, tempfile.TemporaryDirectory() as tmp:
+            self.make_project(tmp)
+            os.makedirs(os.path.join(home, ".claude"))
+            with open(os.path.join(tmp, "README.md"), "w", encoding="utf-8") as f:
+                f.write("PUBONLY and ENVONLY\n")
+            subprocess.run(["git", "-C", tmp, "add", "-A"], check=True)
+            for name, word in (("public-denylist.txt", "PUBONLY"), ("env-denylist.txt", "ENVONLY")):
+                with open(os.path.join(home, ".claude", name), "w", encoding="utf-8") as f:
+                    f.write(word + "\n")
+            env = dict(os.environ, HOME=home, USERPROFILE=home)
+            r = subprocess.run([sys.executable, os.path.join(check_public.REPO, "scripts", "check_public.py"), tmp, "--exclude", "docs/*"],
+                               capture_output=True, text=True, encoding="utf-8", env=env)
+            self.assertIn("個人語: ENV", r.stdout)
+            self.assertNotIn("PUB", r.stdout)
+
     def test_is_excluded(self):
         self.assertTrue(check_public.is_excluded("docs/a/b.md", ["docs/*"]))
         self.assertTrue(check_public.is_excluded("docs/a/b.md", ["docs/a/"]))

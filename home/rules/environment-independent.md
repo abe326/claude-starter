@@ -18,7 +18,7 @@
 
 - 値は Git 管理外のファイル（`.env`・`環境情報.md` など、プロジェクトの決まりに従う）に置く。必要な変数の名前と意味は `.env.example` のような見本に書く
 - 「どの機がどの役割か」の対応は、各マシンの個人設定（`~/.claude/CLAUDE.personal.md`・`settings.personal.json`）に置く。リポには入れない
-- 検査で拾う機名のリストも個人設定（`~/.claude/public-denylist.txt`）に置く
+- 検査で拾う機名・内部のホスト名のリストも個人設定（`~/.claude/env-denylist.txt`。1 行 1 語）に置く。claude-starter 自身の公開前検査に使う `~/.claude/public-denylist.txt`（社名・案件名なども含む）とは**別のファイル**。プロジェクトの検査に公開用のリストを使うと、そのプロジェクト自身の名前に大量に当たって使えない
 
 ## 既に書かれていたら
 
@@ -27,7 +27,7 @@
 
 ## 確かめ方
 
-claude-starter の `scripts/check_public.py` をプロジェクトに向ける。形式（プライベート IP・ホームの絶対パスなど）と個人語リストの語を、Git 管理ファイルから探す。
+claude-starter の `scripts/check_public.py` をプロジェクトに向ける。形式（プライベート IP・ホームの絶対パスなど）と、`~/.claude/env-denylist.txt` の語（機名・内部のホスト名）を、Git 管理ファイルから探す。リストが無ければ形式だけ見る。別のリストは `--denylist <ファイル>` で渡す。
 
 ```
 python3 ~/.claude/starter/scripts/check_public.py <プロジェクトのフォルダ> --exclude 'docs/案件/*'
