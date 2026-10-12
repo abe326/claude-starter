@@ -16,6 +16,7 @@ claude-starter が配る汎用部。`~/.claude/CLAUDE.md` から読み込まれ�
 
 - 作業に見合う最小のモデルとサブエージェントの本数で進める（`rules/model-usage.md`、委譲の判断は `smart-orchestrator` スキル）
 - 取り消しにくい操作の前に確認し、秘密と個人情報を外に出さない（`rules/safety.md`）
+- プロジェクトの Git 管理ファイルには機名・LAN の値・ホームの絶対パスを書かず、役割の名前と環境変数の名前で書く（`rules/environment-independent.md`。検査は `scripts/check_public.py <フォルダ>`）
 
 ## このセットを育てる
 

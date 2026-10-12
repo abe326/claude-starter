@@ -240,6 +240,45 @@ class TestCheckPublic(unittest.TestCase):
                            capture_output=True, text=True, encoding="utf-8")
         self.assertEqual(r.returncode, 0, r.stdout)
 
+    def run_on(self, target, *extra):
+        return subprocess.run([sys.executable, os.path.join(check_public.REPO, "scripts", "check_public.py"), target, "--denylist", os.devnull, *extra],
+                              capture_output=True, text=True, encoding="utf-8")
+
+    def make_project(self, tmp):
+        def g(*a):
+            subprocess.run(["git", "-C", tmp, *a], check=True, capture_output=True)
+        g("init", "-q")
+        os.makedirs(os.path.join(tmp, "docs", "old"))
+        with open(os.path.join(tmp, "README.md"), "w", encoding="utf-8") as f:
+            f.write("clean\n")
+        with open(os.path.join(tmp, "docs", "old", "a.md"), "w", encoding="utf-8") as f:
+            f.write("host 192.168.1.5\n")
+        g("add", "-A")
+
+    def test_target_other_project(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.make_project(tmp)
+            r = self.run_on(tmp)
+            self.assertEqual(r.returncode, 1, r.stdout)
+            self.assertIn("docs/old/a.md", r.stdout)
+
+    def test_exclude_option_and_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.make_project(tmp)
+            self.assertEqual(self.run_on(tmp, "--exclude", "docs/old/*").returncode, 0)
+            with open(os.path.join(tmp, ".public-exclude"), "w", encoding="utf-8") as f:
+                f.write("# 過去の記録\ndocs/old/\n")
+            self.assertEqual(self.run_on(tmp).returncode, 0)
+
+    def test_target_must_be_git_repo(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(self.run_on(tmp).returncode, 2)
+
+    def test_is_excluded(self):
+        self.assertTrue(check_public.is_excluded("docs/a/b.md", ["docs/*"]))
+        self.assertTrue(check_public.is_excluded("docs/a/b.md", ["docs/a/"]))
+        self.assertFalse(check_public.is_excluded("src/b.md", ["docs/*"]))
+
 
 if __name__ == "__main__":
     unittest.main()

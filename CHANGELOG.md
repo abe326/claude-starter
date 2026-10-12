@@ -7,7 +7,12 @@
 
 ### Added
 
+- `home/rules/environment-independent.md`: プロジェクトに機名・LAN の値・ホームの絶対パスを書かず、役割の名前と環境変数の名前で書く決まり
+- `scripts/check_public.py`: 任意のプロジェクトのフォルダを引数に取れる。外すパスは `--exclude` と対象直下の `.public-exclude`（既定の動きは変わらない）
+
 ### Changed
+
+- `home/CLAUDE.md` から新しい rules を指す
 
 ### Fixed
 

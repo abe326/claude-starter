@@ -3,6 +3,8 @@
 
 使い方:
   python3 scripts/check_public.py              作業ツリー（追跡中＋未追跡で ignore されていないもの）
+  python3 scripts/check_public.py <フォルダ>   任意のプロジェクト（Git リポジトリ）に向ける。既定はこのリポ
+  python3 scripts/check_public.py <フォルダ> --exclude 'docs/案件/*'   過去の記録など、検査から外すパス（glob。繰り返せる）
   python3 scripts/check_public.py --history    加えて git の全履歴（コミットメッセージと差分）
   python3 scripts/check_public.py --denylist F 個人語リストを指定（既定 ~/.claude/public-denylist.txt。無ければ形式検査だけ）
 
@@ -12,11 +14,14 @@
     denylist はリポに入れない（それ自体が個人情報）
   - Office 文書（pptx/docx/xlsx/potx）は中の XML の文字と作成者も見る
 例外: `.public-allow`（1 行 1 パス、タブの後に理由）にあるファイルは形式検査だけ外す（個人語は外さない）
+  `.public-exclude`（1 行 1 glob、# はコメント）と `--exclude` に当たるファイルは検査から丸ごと外す（向けた先の過去の記録用）。
+  どちらも向けた先のフォルダの中のものを読む。`--history` の履歴は外せない（作業ツリーの外し方に関わらず全部見る）
 出力: NG の行と最後に `pass=N fail=M`。fail>0 なら exit 1
 """
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import os
 import re
 import subprocess
@@ -65,31 +70,40 @@ def load_denylist(path: str) -> list:
     return out
 
 
-def load_allow() -> set:
-    out = set()
+def load_lines(root: str, name: str) -> list:
+    """root 直下の設定ファイルを読む。1 行 1 件で、タブの後ろは理由。# はコメント"""
+    out = []
     try:
-        with open(os.path.join(REPO, ".public-allow"), encoding="utf-8") as f:
+        with open(os.path.join(root, name), encoding="utf-8") as f:
             for line in f:
                 t = line.split("\t", 1)[0].strip()
                 if t and not t.startswith("#"):
-                    out.add(t)
+                    out.append(t)
     except OSError:
         pass
     return out
 
 
-def git(*args: str) -> str:
-    r = subprocess.run(["git", "-C", REPO, *args], capture_output=True, text=True, encoding="utf-8", errors="replace")
+def load_allow(root: str = REPO) -> set:
+    return set(load_lines(root, ".public-allow"))
+
+
+def is_excluded(rel: str, patterns: list) -> bool:
+    return any(fnmatch.fnmatch(rel, p) or fnmatch.fnmatch(rel, p.rstrip("/") + "/*") for p in patterns)
+
+
+def git(*args: str, root: str = REPO) -> str:
+    r = subprocess.run(["git", "-C", root, *args], capture_output=True, text=True, encoding="utf-8", errors="replace")
     return r.stdout if r.returncode == 0 else ""
 
 
-def repo_files() -> list:
-    names = git("ls-files", "-z").split("\0") + git("ls-files", "-z", "--others", "--exclude-standard").split("\0")
-    return sorted({n for n in names if n and os.path.isfile(os.path.join(REPO, n))})
+def repo_files(root: str = REPO) -> list:
+    names = git("ls-files", "-z", root=root).split("\0") + git("ls-files", "-z", "--others", "--exclude-standard", root=root).split("\0")
+    return sorted({n for n in names if n and os.path.isfile(os.path.join(root, n))})
 
 
-def text_of(rel: str) -> str | None:
-    p = os.path.join(REPO, rel)
+def text_of(rel: str, root: str = REPO) -> str | None:
+    p = os.path.join(root, rel)
     low = rel.lower()
     if low.endswith(OFFICE):
         try:
@@ -139,15 +153,24 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description="公開前の検査")
     ap.add_argument("--history", action="store_true", help="git の全履歴も見る")
     ap.add_argument("--denylist", default=DEFAULT_DENY)
+    ap.add_argument("target", nargs="?", default=REPO, help="検査するプロジェクトのフォルダ（Git リポジトリ。既定はこのリポ）")
+    ap.add_argument("--exclude", action="append", default=[], metavar="GLOB", help="検査から外すパス（繰り返せる）")
     args = ap.parse_args(argv)
 
+    root = os.path.abspath(args.target)
+    if git("rev-parse", "--is-inside-work-tree", root=root).strip() != "true":
+        print(f"error: Git リポジトリではない: {args.target}", file=sys.stderr)
+        return 2
     deny = load_denylist(args.denylist)
-    allow = load_allow()
+    allow = load_allow(root)
+    exclude = load_lines(root, ".public-exclude") + args.exclude
     if not deny:
         print(f"note: 個人語リストが無い（{args.denylist}）。形式の検査だけ行う")
     ok = ng = 0
-    for rel in repo_files():
-        text = text_of(rel)
+    for rel in repo_files(root):
+        if is_excluded(rel, exclude):
+            continue
+        text = text_of(rel, root)
         if text is None:
             continue
         hits = scan(rel + "(名前)", rel, deny, False) + scan(rel, text, deny, rel not in allow)
@@ -156,7 +179,7 @@ def main(argv: list[str]) -> int:
         ng += bool(hits)
         ok += not hits
     if args.history:
-        log = git("log", "--all", "-p", "--no-color", "--format=commit %H%n%an <%ae>%n%B")
+        log = git("log", "--all", "-p", "--no-color", "--format=commit %H%n%an <%ae>%n%B", root=root)
         # 作業ツリーで例外にしたファイルの差分は形式検査を外す（個人語は見る）
         chunks = re.split(r"(?m)^(?=commit [0-9a-f]{40}$|diff --git )", log)
         hist_hits = []
