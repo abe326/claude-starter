@@ -9,3 +9,9 @@
 
 - `C="sudo -u x env A=b"; $C cmd` や `N="python3 new.py"; $N …` は、zsh では全体が 1 つのコマンド名になり「no such file or directory」で失敗する。結果を grep で絞っていると、何も出ずに成功したように見える
 - 複数語のコマンドは変数に入れない。繰り返すなら bash のスクリプトにするか、Python の subprocess にリストで渡す。ユーザーに渡すコマンドも同じ
+- 複数のファイル名を 1 つの変数に入れて `scp $F host:` のように渡すのも同じで、zsh では 1 つの名前として扱われる。ファイル名は直接並べる
+
+## zsh では `read -p` がプロンプトにならない
+
+- bash の `read -p "続けるなら Enter " _` は、zsh では「コプロセスから読む」意味になり「no coprocess」で止まる。`cmd && read -p … && reboot` のような確認つきの 1 本は、確認の手前で止まって後半が動かない
+- ログインシェルが zsh の機械で打ってもらうコマンド（`ssh host 'sudo …'` で遠隔のシェルに渡すものも含む）は、確認を挟むなら `sudo bash -c '…'` か `bash -c '…'` の中に入れる。zsh で書くなら `read "?続けるなら Enter "` の形にする
