@@ -40,6 +40,26 @@ window.TASKS = [
     "closed": "2026-10-25",
     "state": "closed",
     "body": "\n## 概要\n（何を決める必要があるか。1〜3 行。決まらないと何が止まるか）\n\n## 論点\n- …\n\n## 選択肢\n- 案A: …\n- 案B: …\n- 推奨: （あれば。理由 1 行）\n\n## 決着条件\n（誰が・何をもって決着とするか。frontmatter の decider / due と食い違わせない）\n\n## 決定\nsettings.base.json に全体で登録し、プロジェクトの env に CC_OWN_FOLDER_GUARD=1 があるときだけ判定する（既定は何もしない）。例外は CC_OFFICE_DIR と ~/.claude/own-folder-allow.txt。skill は置き場の README を正本とし、番号は起票.sh に取らせる\n→ 反映済: README「自分のフォルダの外へ書かない hook」\n→ HOME-01\n\n## 過去の経緯\n（これまでの打合せ・決定の変遷）\n\n## 参照情報\n（打合せ出典・設計書・関連タスク ID・関連画面 ID）"
+  },
+  {
+    "id": "TOOL-02",
+    "title": "peer-request スキルと own_folder_guard hook を claude-starter に置くか",
+    "area": "install・検査・hook",
+    "status": "完了",
+    "priority": "中",
+    "kind": "課題",
+    "epic": "",
+    "owner": "",
+    "due": "",
+    "decider": "",
+    "tags": [],
+    "screens": [],
+    "source": "",
+    "created": "2026-10-26",
+    "updated": "2026-10-26",
+    "closed": "2026-10-26",
+    "state": "closed",
+    "body": "\n## 概要\n（何を決める必要があるか。1〜3 行。決まらないと何が止まるか）\n\n## 論点\n- …\n\n## 選択肢\n- 案A: …\n- 案B: …\n- 推奨: （あれば。理由 1 行）\n\n## 決着条件\n（誰が・何をもって決着とするか。frontmatter の decider / due と食い違わせない）\n\n## 決定\n置かない。fd2ae9f・89d3382・1cbeb0d を git revert で戻した（2026-10-26 ユーザー決定。汎用でなく自分の環境でだけ効かせるもので、全体設定だけで動く形に作り直す。作り直しは別のプロジェクトで相談）。HOME-01 の成果と TOOL-01 の決定はこれで取り下げ\n→ 取り下げ: HOME-01・TOOL-01 の成果を revert\n\n## 過去の経緯\n（これまでの打合せ・決定の変遷）\n\n## 参照情報\n（打合せ出典・設計書・関連タスク ID・関連画面 ID）"
   }
 ];
 window.SCREENS = [];
