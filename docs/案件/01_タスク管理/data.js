@@ -3,7 +3,7 @@ window.TASKS = [
     "id": "HOME-01",
     "title": "同僚として依頼し合う決まりの skill と、自分のフォルダの外へ書かない hook を足す",
     "area": "配布物(home/)",
-    "status": "進行中",
+    "status": "完了",
     "priority": "高",
     "kind": "タスク",
     "epic": "",
@@ -17,9 +17,29 @@ window.TASKS = [
     "source": "依頼 2026-10-25-03（AI 秘書のプロジェクトからの引き継ぎ）",
     "created": "2026-10-25",
     "updated": "2026-10-25",
-    "closed": "",
-    "state": "open",
-    "body": "\n## 概要\nプロジェクトごとのセッションが同僚として直接頼み合う決まりを skill（`peer-request`）にし、自分のプロジェクトの外へ書かせない PreToolUse hook（`own_folder_guard.py`）を、プロジェクトごとに効かせる形で配る。\n\n## 対応の意義（なぜやるか）\n- 対応しないデメリット: プロジェクト間の依頼がユーザー経由の取り次ぎになり、文脈の写しと伝言が増える。直接頼めるようにしても、決まりと歯止めが無いと別のプロジェクトのファイルを直接書き換えたり、依頼が連鎖したりする\n- 対応するメリット: 依頼元が確認事項に自分で答え、ユーザーには判断だけが上がる。書き込みは hook で自分のフォルダに限られる\n\n## 対応後の変更点（利用者視点）\n- 「〇〇に頼んで」と言うと、セッションが依頼書を起票して相手のセッションへ送り、確認・完了が依頼元に返る（`CC_OFFICE_DIR` を入れたマシンだけ）\n- `CC_OWN_FOLDER_GUARD=1` を入れたプロジェクトでは、外への Edit・Write が止まり、依頼するよう案内が出る。入れていないプロジェクトは変わらない\n\n## 対応計画の概要\n- [x] skill `home/skills/peer-request/SKILL.md`（依頼を出す側・受ける側・確認が来た側・完了が来た側・台帳・禁止事項）\n- [x] hook `home/hooks/own_folder_guard.py` と `settings.base.json` への登録（既定は何もしない）\n- [x] テスト `scripts/tests/test_own_folder_guard.py`（27 件）\n- [x] README・CHANGELOG\n- [ ] commit・push（ユーザーの確認後）\n- [ ] 試しの 2 プロジェクトで効かせる（そのプロジェクトのセッションが行う。こちらからは書かない）\n\n## 対応計画の詳細\n- 置き場は環境変数 `CC_OFFICE_DIR`。中の形（`README.md`・`社員名簿.md`・`回覧台帳.md`・`起票.sh`・依頼書）は置き場を作る側のプロジェクトと合わせた。skill は README を正本として読み、番号は `起票.sh` に取らせ、依頼書のパスは起票.sh の出力と台帳の「依頼書」列を使う（置き場の形が変わっても skill を直さずに済む）\n- hook の効かせ方: `settings.base.json` に全体で登録し、プロジェクトの env（`.claude/settings.local.json` か `settings.json`）に `CC_OWN_FOLDER_GUARD=1` があるときだけ判定する。hook に env が渡らない場合に備えて、settings の env も直接読む\n- 通す場所: 自分のプロジェクト（`CLAUDE_PROJECT_DIR`）・`~/.claude/`・一時フォルダ・`CC_OFFICE_DIR`・`~/.claude/own-folder-allow.txt`（個人部。全員が書く台帳など）\n- 元にしたのは依頼元のプロジェクトにある guard hook（対象を固定の親フォルダの中に限っていた）。汎用にするため、自分のプロジェクトの外は既定で止め、通す場所を足す形にした\n\n## 影響・依存\n- `settings.base.json` を変えたので、次のセッション開始時の sync で全マシンの settings.json に PreToolUse が入る。env を入れていないプロジェクトでは即 exit 0\n- 置き場の作成と `CC_OFFICE_DIR`・`own-folder-allow.txt` の値は、各マシンの個人部（このリポの外）\n- 設計書 06（品質と確認）は未作成。Sketch の間は足さない\n\n## 完了条件（クローズ3条件）\n- [ ] 対象環境へ適用済み（push 後、各マシンの sync で入る）\n- [x] 確認者の確認: hook のテスト 27 件と全テスト・公開前検査（`--history`）が通る\n- [x] 該当なし: 正本への反映（README・CHANGELOG に反映済み。設計書は Sketch で未作成）\n\n## 過去の経緯\n- 2026-10-25 依頼元のプロジェクトで「案件セッション同士が同僚として依頼し合う」方式を相談し、推奨案（当事者どうしで直接＋共通の回覧台帳、確認は依頼元がまず答える）で進めると決定。skill と hook はこのリポ、置き場と全体の決まりは全体設定のプロジェクトに分担\n- 置き場の形は、置き場を作るセッションと SendMessage で合わせた（採番は起票.sh、skill はパスを組み立てない）\n- hook は「いきなり全プロジェクトで効かせない」ため、プロジェクトごとの env で効かせる形にした\n\n## 参照情報\n- `home/skills/peer-request/SKILL.md`・`home/hooks/own_folder_guard.py`・`scripts/tests/test_own_folder_guard.py`・README「同僚として依頼し合う（peer-request）」"
+    "closed": "2026-10-25",
+    "state": "closed",
+    "body": "\n## 概要\nプロジェクトごとのセッションが同僚として直接頼み合う決まりを skill（`peer-request`）にし、自分のプロジェクトの外へ書かせない PreToolUse hook（`own_folder_guard.py`）を、プロジェクトごとに効かせる形で配る。\n\n## 対応の意義（なぜやるか）\n- 対応しないデメリット: プロジェクト間の依頼がユーザー経由の取り次ぎになり、文脈の写しと伝言が増える。直接頼めるようにしても、決まりと歯止めが無いと別のプロジェクトのファイルを直接書き換えたり、依頼が連鎖したりする\n- 対応するメリット: 依頼元が確認事項に自分で答え、ユーザーには判断だけが上がる。書き込みは hook で自分のフォルダに限られる\n\n## 対応後の変更点（利用者視点）\n- 「〇〇に頼んで」と言うと、セッションが依頼書を起票して相手のセッションへ送り、確認・完了が依頼元に返る（`CC_OFFICE_DIR` を入れたマシンだけ）\n- `CC_OWN_FOLDER_GUARD=1` を入れたプロジェクトでは、外への Edit・Write が止まり、依頼するよう案内が出る。入れていないプロジェクトは変わらない\n\n## 対応計画の概要\n- [x] skill `home/skills/peer-request/SKILL.md`（依頼を出す側・受ける側・確認が来た側・完了が来た側・台帳・禁止事項）\n- [x] hook `home/hooks/own_folder_guard.py` と `settings.base.json` への登録（既定は何もしない）\n- [x] テスト `scripts/tests/test_own_folder_guard.py`（27 件）\n- [x] README・CHANGELOG\n- [x] commit・push（2026-10-25 ユーザー承認。fd2ae9f）\n- [x] 該当なし: 試しの 2 プロジェクトで効かせるのは、それぞれのセッションの作業（依頼元へ完了報告で伝えた）\n\n## 対応計画の詳細\n- 置き場は環境変数 `CC_OFFICE_DIR`。中の形（`README.md`・`社員名簿.md`・`回覧台帳.md`・`起票.sh`・依頼書）は置き場を作る側のプロジェクトと合わせた。skill は README を正本として読み、番号は `起票.sh` に取らせ、依頼書のパスは起票.sh の出力と台帳の「依頼書」列を使う（置き場の形が変わっても skill を直さずに済む）\n- hook の効かせ方: `settings.base.json` に全体で登録し、プロジェクトの env（`.claude/settings.local.json` か `settings.json`）に `CC_OWN_FOLDER_GUARD=1` があるときだけ判定する。hook に env が渡らない場合に備えて、settings の env も直接読む\n- 通す場所: 自分のプロジェクト（`CLAUDE_PROJECT_DIR`）・`~/.claude/`・一時フォルダ・`CC_OFFICE_DIR`・`~/.claude/own-folder-allow.txt`（個人部。全員が書く台帳など）\n- 元にしたのは依頼元のプロジェクトにある guard hook（対象を固定の親フォルダの中に限っていた）。汎用にするため、自分のプロジェクトの外は既定で止め、通す場所を足す形にした\n\n## 影響・依存\n- `settings.base.json` を変えたので、次のセッション開始時の sync で全マシンの settings.json に PreToolUse が入る。env を入れていないプロジェクトでは即 exit 0\n- 置き場の作成と `CC_OFFICE_DIR`・`own-folder-allow.txt` の値は、各マシンの個人部（このリポの外）\n- 設計書 06（品質と確認）は未作成。Sketch の間は足さない\n\n## 完了条件（クローズ3条件）\n- [x] 対象環境へ適用済み（push 済み。各マシンは次のセッション開始の sync で入る）\n- [x] 確認者の確認: hook のテスト 27 件と全テスト・公開前検査（`--history`）が通る\n- [x] 該当なし: 正本への反映（README・CHANGELOG に反映済み。設計書は Sketch で未作成）\n\n## 過去の経緯\n- 2026-10-25 依頼元のプロジェクトで「案件セッション同士が同僚として依頼し合う」方式を相談し、推奨案（当事者どうしで直接＋共通の回覧台帳、確認は依頼元がまず答える）で進めると決定。skill と hook はこのリポ、置き場と全体の決まりは全体設定のプロジェクトに分担\n- 置き場の形は、置き場を作るセッションと SendMessage で合わせた（採番は起票.sh、skill はパスを組み立てない）\n- hook は「いきなり全プロジェクトで効かせない」ため、プロジェクトごとの env で効かせる形にした\n\n## 参照情報\n- `home/skills/peer-request/SKILL.md`・`home/hooks/own_folder_guard.py`・`scripts/tests/test_own_folder_guard.py`・README「同僚として依頼し合う（peer-request）」"
+  },
+  {
+    "id": "TOOL-01",
+    "title": "自分のフォルダの外へ書かない hook をどう効かせるか",
+    "area": "install・検査・hook",
+    "status": "完了",
+    "priority": "中",
+    "kind": "課題",
+    "epic": "",
+    "owner": "",
+    "due": "",
+    "decider": "",
+    "tags": [],
+    "screens": [],
+    "source": "",
+    "created": "2026-10-25",
+    "updated": "2026-10-25",
+    "closed": "2026-10-25",
+    "state": "closed",
+    "body": "\n## 概要\n（何を決める必要があるか。1〜3 行。決まらないと何が止まるか）\n\n## 論点\n- …\n\n## 選択肢\n- 案A: …\n- 案B: …\n- 推奨: （あれば。理由 1 行）\n\n## 決着条件\n（誰が・何をもって決着とするか。frontmatter の decider / due と食い違わせない）\n\n## 決定\nsettings.base.json に全体で登録し、プロジェクトの env に CC_OWN_FOLDER_GUARD=1 があるときだけ判定する（既定は何もしない）。例外は CC_OFFICE_DIR と ~/.claude/own-folder-allow.txt。skill は置き場の README を正本とし、番号は起票.sh に取らせる\n→ 反映済: README「自分のフォルダの外へ書かない hook」\n→ HOME-01\n\n## 過去の経緯\n（これまでの打合せ・決定の変遷）\n\n## 参照情報\n（打合せ出典・設計書・関連タスク ID・関連画面 ID）"
   }
 ];
 window.SCREENS = [];

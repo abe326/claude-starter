@@ -3,7 +3,7 @@ id: HOME-01
 title: 同僚として依頼し合う決まりの skill と、自分のフォルダの外へ書かない hook を足す
 area: 配布物(home/)
 kind: タスク
-status: 進行中
+status: 完了
 priority: 高
 epic: 
 owner: 
@@ -13,7 +13,7 @@ screens: []
 source: 依頼 2026-10-25-03（AI 秘書のプロジェクトからの引き継ぎ）
 created: 2026-10-25
 updated: 2026-10-25
-closed: 
+closed: 2026-10-25
 ---
 
 ## 概要
@@ -32,8 +32,8 @@ closed:
 - [x] hook `home/hooks/own_folder_guard.py` と `settings.base.json` への登録（既定は何もしない）
 - [x] テスト `scripts/tests/test_own_folder_guard.py`（27 件）
 - [x] README・CHANGELOG
-- [ ] commit・push（ユーザーの確認後）
-- [ ] 試しの 2 プロジェクトで効かせる（そのプロジェクトのセッションが行う。こちらからは書かない）
+- [x] commit・push（2026-10-25 ユーザー承認。fd2ae9f）
+- [x] 該当なし: 試しの 2 プロジェクトで効かせるのは、それぞれのセッションの作業（依頼元へ完了報告で伝えた）
 
 ## 対応計画の詳細
 - 置き場は環境変数 `CC_OFFICE_DIR`。中の形（`README.md`・`社員名簿.md`・`回覧台帳.md`・`起票.sh`・依頼書）は置き場を作る側のプロジェクトと合わせた。skill は README を正本として読み、番号は `起票.sh` に取らせ、依頼書のパスは起票.sh の出力と台帳の「依頼書」列を使う（置き場の形が変わっても skill を直さずに済む）
@@ -47,7 +47,7 @@ closed:
 - 設計書 06（品質と確認）は未作成。Sketch の間は足さない
 
 ## 完了条件（クローズ3条件）
-- [ ] 対象環境へ適用済み（push 後、各マシンの sync で入る）
+- [x] 対象環境へ適用済み（push 済み。各マシンは次のセッション開始の sync で入る）
 - [x] 確認者の確認: hook のテスト 27 件と全テスト・公開前検査（`--history`）が通る
 - [x] 該当なし: 正本への反映（README・CHANGELOG に反映済み。設計書は Sketch で未作成）
 
