@@ -38,6 +38,18 @@
     "command": "@PY@ ~/.claude/starter/home/statusline/statusline.py"
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "@PY@ ~/.claude/starter/home/hooks/own_folder_guard.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "hooks": [

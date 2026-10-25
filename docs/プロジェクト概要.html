@@ -224,9 +224,12 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
   <h3>タスクの状況</h3>
   <div class="snapshot">
     <!-- BEGIN:task-snapshot -->
-<p>生成: 2026-10-01 19:40 ／ OPEN 0 件（課題 0・確認待ち 0・進行中 0・期限切れ 0）／ CLOSED 0 件</p>
+<p>生成: 2026-10-25 23:01 ／ OPEN 1 件（課題 0・確認待ち 0・進行中 1・期限切れ 0）／ CLOSED 0 件</p>
 <p>画面: 完了 0 / 0</p>
-<p>OPEN のタスクはありません（課題は「決めてほしいこと」に出る）。</p>
+<table>
+<tr><th>ID</th><th>タイトル</th><th>優先度</th><th>状態</th><th>期限</th></tr>
+<tr><td>HOME-01</td><td>同僚として依頼し合う決まりの skill と、自分のフォルダの外へ書かない hook を足す</td><td>高</td><td>進行中</td><td>—</td></tr>
+</table>
     <!-- END:task-snapshot -->
   </div>
   <p class="note">この枠も <code>build.py</code> が書き換える（課題は「決めてほしいこと」に出るので除く）。一覧は <code>docs/案件/01_タスク管理/index.html</code>。</p>
