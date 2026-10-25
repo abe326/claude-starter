@@ -148,6 +148,17 @@ class Judge(GuardCase):
         self.on()
         self.assertTrue(self.denied(os.path.join(self.office, "回覧台帳.md")))
 
+    def test_vars_in_target_are_not_expanded(self):
+        self.on(SNEAK=self.claude)
+        # ツールは $SNEAK を展開しないので、実際に書く先は自分のプロジェクトの外
+        self.assertTrue(self.denied(os.path.join(self.other, "$SNEAK", "a.md")))
+        self.assertTrue(self.denied("$SNEAK/a.md", cwd=self.other))
+
+    def test_allow_file_itself_is_denied(self):
+        self.on()
+        self.assertTrue(self.denied(os.path.join(self.claude, "own-folder-allow.txt")))
+        self.assertFalse(self.denied(os.path.join(self.claude, "other.txt")))
+
     def test_empty_path(self):
         self.on()
         self.assertIsNone(guard.judge(None))

@@ -14,8 +14,10 @@
   - 社内連絡の置き場（CC_OFFICE_DIR）
   - ~/.claude/own-folder-allow.txt に書いたパス（1 行 1 つ。# はコメント。~ と $変数 を展開。
     フォルダならその中すべて。* ? [ を含む行は glob として実体のパスに当てる）
-リンク経由も実体のパスで判定する。
-限界: Bash 経由の書き込みは見ていない（peer-request スキルの決まりで禁止している）。
+リンク経由も実体のパスで判定する。対象のパスの $変数 は展開しない（ツールと同じに解釈する）。
+効いているセッションからは own-folder-allow.txt 自体も書かせない（例外はユーザーが足す）。
+限界: 誤って書き換えるのを止める歯止めで、守りの境界ではない。Bash 経由の書き込みと、
+プロジェクトの settings で効き目を外すことは見ていない（peer-request スキルの決まりで禁止している）。
 入力や設定が読めないときは止めない（hook の不具合でセッションを止めない）。
 """
 import fnmatch
@@ -34,7 +36,13 @@ def claude_dir() -> str:
 
 
 def real(path: str) -> str:
+    """設定の値（信頼する側）のパス。~ と $変数 を展開して実体にする。"""
     return os.path.normcase(os.path.realpath(os.path.expandvars(os.path.expanduser(path))))
+
+
+def real_target(path: str) -> str:
+    """ツールが書く先のパス。$変数 は展開しない（ツールは展開しないので、展開すると判定と実際がずれる）。"""
+    return os.path.normcase(os.path.realpath(os.path.expanduser(path)))
 
 
 def inside(path: str, base: str) -> bool:
@@ -105,7 +113,13 @@ def judge(file_path, cwd=None, project=None):
     path = os.path.expanduser(file_path)
     if not os.path.isabs(path):
         path = os.path.join(cwd or project, path)
-    target = real(path)
+    target = real_target(path)
+    allow_file = real(os.path.join(claude_dir(), ALLOW_FILE))
+    if target == allow_file:
+        return (
+            f"例外の一覧（{allow_file}）は、この hook が効いているセッションからは書き換えない。\n"
+            "例外が要るときは、理由とパスをユーザーに伝えて、ユーザーに足してもらう。"
+        )
     if any(inside(target, b) for b in allowed_bases(project)):
         return None
     if any(matches_entry(target, e) for e in allow_entries()):

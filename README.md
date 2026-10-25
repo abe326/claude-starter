@@ -91,7 +91,7 @@ hook は `settings.base.json` で全プロジェクトに登録してあるが�
 | 社内連絡の置き場 | `CC_OFFICE_DIR` |
 | 全員が書く台帳など、ほかの例外 | `~/.claude/own-folder-allow.txt`（個人部。1 行 1 パス、`#` でコメント、`~` と `$変数` を展開。フォルダならその中すべて、`*` `?` `[` を含む行は glob） |
 
-リンク経由も実体のパスで判定する。入力や設定が読めないときは止めない。テストは `scripts/tests/test_own_folder_guard.py`。
+リンク経由も実体のパスで判定する。入力や設定が読めないときは止めない。`own-folder-allow.txt` 自体は、hook が効いているセッションからは書き換えられない（例外はユーザーが足す）。誤って書き換えるのを止める歯止めで、守りの境界ではない（Bash とプロジェクトの settings の書き換えは見ていない）。テストは `scripts/tests/test_own_folder_guard.py`。
 
 ## このリポを開発する
 
